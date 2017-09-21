@@ -1,9 +1,15 @@
 package tests;
 
-import parsers.AnnotationParser;
+import containers.BeanFactoryFromAnnotations;
 
 public class Main {
     public static void main(String[] args) {
-        AnnotationParser parser = new AnnotationParser();
+        BeanFactoryFromAnnotations an = new BeanFactoryFromAnnotations();
+        an.scan(".\\target\\classes\\containers");
+
+
+
+
+
     }
 }
