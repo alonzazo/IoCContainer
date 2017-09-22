@@ -8,4 +8,5 @@ package containers.Annotations;
 
 public @interface Configuration {
     String value() default "";
+
 }

@@ -5,6 +5,7 @@ package containers.Annotations;
  */
 public @interface Scope {
     ScopeType scope = ScopeType.singleton;
+
 }
 enum ScopeType{
     singleton,prototype
