@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 public @interface Autowired {
     boolean required = false;
     Autowire autowiring = Autowire.byType;
+    String value();
 
 }
 enum Autowire {
