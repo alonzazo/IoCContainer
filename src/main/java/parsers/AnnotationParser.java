@@ -28,13 +28,11 @@ public class AnnotationParser implements Parser {
         beanClass = getClass(pack);
         id = beanClass.getSimpleName();
         Annotation[] annos = beanClass.getAnnotations();
-        if(annos[0].annotationType().getSimpleName().equals("Component"))
-        {
-            if(annos[1].annotationType().getSimpleName().equals("Scope"))
-            {
-                String[] parametter =  annos[1].toString().split("\"");
-                switch(parametter[1])
-                {
+        if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
+            System.out.println("FUNCIONA MIERDA");
+            if (annos.length >= 2 && annos[1].annotationType().getSimpleName().equals("Scope")) {
+                String[] parametter = annos[1].toString().split("\"");
+                switch (parametter[0]) {
                     case "Prototype":
                         isSingleton = false;
                         break;
@@ -43,27 +41,19 @@ public class AnnotationParser implements Parser {
                         isSingleton = true;
                         break;
                 }
-            }
-            else
-            {
+            } else {
                 isSingleton = true;
             }
             Method[] methods = getMethods(beanClass);
-            for(Method method : methods)
-            {
+            for (Method method : methods) {
                 Annotation[] methodAnnos = method.getAnnotations();
-                for(Annotation an : methodAnnos)
-                {
+                for (Annotation an : methodAnnos) {
                     String type = an.annotationType().getSimpleName();
-                    switch (type)
-                    {
+                    switch (type) {
                         case "Autowired":
-                            if(method.getName().contains("set"))
-                            {
+                            if (method.getName().contains("set")) {
                                 setter = method.getName();
-                            }
-                            else
-                            {
+                            } else {
                                 setter = null;
                             }
                             break;
@@ -73,7 +63,6 @@ public class AnnotationParser implements Parser {
                         case "PreDestruction":
                             preDes = method.getName();
                             break;
-
                     }
                 }
             }

@@ -1,26 +1,36 @@
 package tests;
 
-import javax.annotation.PostConstruct;
+import Annotations.*;
+import com.sun.org.glassfish.external.probe.provider.annotations.Probe;
+
 import javax.annotation.Resource;
 import javax.xml.ws.Action;
 import java.lang.annotation.Target;
 
-@Resource
+
+@Component
+@Scope(value = "Singleton")
+//@Resource
 public class Hey {
     String hola;
     String lalo;
+
     public Hey()
     {
 
     }
 
-    @Action
-    public void SetHola(String hi)
+    @Autowired
+    public void setHolaetHola(String hi)
     {
         this.hola = hi;
     }
-    @PostConstruct
+
+    @PostInicialization
     public void setCasa(String tu) {
         this.lalo = tu;
     }
+
+    @PreDestruction
+    public void destroy(){}
 }
