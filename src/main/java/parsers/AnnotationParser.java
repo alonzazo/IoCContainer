@@ -1,5 +1,6 @@
 package parsers;
 
+import containers.AbstractBeanFactory;
 import containers.Bean;
 import containers.BeanFactory;
 
@@ -8,31 +9,19 @@ import java.lang.reflect.Method;
 
 public class AnnotationParser implements Parser {
 
-    private String pack;
-
-
     public AnnotationParser()
     {
 
     }
-
-    public AnnotationParser(String pack)
-    {
-        this.pack = pack;
-    }
-    public void getBeans(BeanFactory bf) throws ClassNotFoundException {
+    public void getBeans(AbstractBeanFactory bf, Class c) throws ClassNotFoundException {
         Bean bean;
-        String id, postCons = null, preDes = null, setter = null;
+        String id = null, postCons = null, preDes = null, setter = null;
         Boolean isSingleton = null;
-        Class beanClass;
-        beanClass = getClass(pack);
-        id = beanClass.getSimpleName();
-        Annotation[] annos = beanClass.getAnnotations();
+        Annotation[] annos = c.getAnnotations();
         if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
-            System.out.println("FUNCIONA MIERDA");
             if (annos.length >= 2 && annos[1].annotationType().getSimpleName().equals("Scope")) {
-                String[] parametter = annos[1].toString().split("\"");
-                switch (parametter[0]) {
+                String[] parameter = annos[1].toString().split("=");
+                switch (parameter[1].substring(0,parameter[1].length()-1)) {
                     case "Prototype":
                         isSingleton = false;
                         break;
@@ -44,13 +33,22 @@ public class AnnotationParser implements Parser {
             } else {
                 isSingleton = true;
             }
-            Method[] methods = getMethods(beanClass);
+            Method[] methods = getMethods(c);
             for (Method method : methods) {
                 Annotation[] methodAnnos = method.getAnnotations();
                 for (Annotation an : methodAnnos) {
                     String type = an.annotationType().getSimpleName();
                     switch (type) {
                         case "Autowired":
+                            String[] parameter = an.toString().split("=");
+                            if(parameter.length != 0 && !parameter[1].substring(0,parameter[1].length()-1).equals("byType"))
+                            {
+                                id = parameter[1].substring(0,parameter[1].length()-1);
+                            }
+                            else
+                            {
+                                id = c.getSimpleName();
+                            }
                             if (method.getName().contains("set")) {
                                 setter = method.getName();
                             } else {
@@ -66,22 +64,18 @@ public class AnnotationParser implements Parser {
                     }
                 }
             }
+            bean = new Bean(id, isSingleton, c, postCons, preDes,setter);
+            System.out.println(id);
+            bf.addBean(id, bean);
         }
-        else
-        {
+        else {
             System.out.println("NO ES BEAN");
         }
-        bean = new Bean(id, isSingleton, beanClass, postCons, preDes,setter);
-        bf.addBean(id, bean);
     }
 
     private Method[] getMethods(Class c)
     {
         return c.getMethods();
-    }
-
-    private Class getClass(String classpack) throws ClassNotFoundException {
-        return Class.forName(classpack);
     }
 
 }

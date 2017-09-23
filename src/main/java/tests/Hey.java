@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 
 @Component
-@Scope(value = "Singleton")
+@Scope("Prototype")
 //@Resource
 public class Hey {
     String hola;
@@ -20,7 +20,7 @@ public class Hey {
 
     }
 
-    @Autowired
+    @Autowired("HOLAAA")
     public void setHolaetHola(String hi)
     {
         this.hola = hi;

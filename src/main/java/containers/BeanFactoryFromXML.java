@@ -1,4 +1,8 @@
 package containers;
 
-public class BeanFactoryFromXML extends BeanFactory {
+public class BeanFactoryFromXML extends AbstractBeanFactory {
+    public void scan(String s)
+    {
+
+    }
 }

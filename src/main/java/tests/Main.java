@@ -1,30 +1,28 @@
 package tests;
 
-import containers.Bean;
 import containers.BeanFactory;
 import containers.BeanFactoryFromAnnotations;
-import parsers.AnnotationParser;
+import org.reflections.Reflections;
+import org.reflections.Store;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import parsers.BeanConfigurationException;
-import parsers.Parser;
 
-import java.lang.annotation.Annotation;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 
 public class Main {
-    public static void main(String[] args) throws BeanConfigurationException, ClassNotFoundException {
-        /*BeanFactoryFromAnnotations an = new BeanFactoryFromAnnotations();
-        an.scan(".\\target\\classes\\containers");*/
-        BeanFactory bf = new BeanFactoryFromAnnotations();
-        Parser parser = new AnnotationParser("tests.Hey");
-        parser.getBeans(bf);
-        /*Class c = Class.forName("tests.Hey");
-        System.out.println(c.getName());
-        Annotation[] an = c.getAnnotations();
-        System.out.println(an[0].annotationType().getSimpleName());*/
-        //System.out.println(an.annotationType().getSimpleName());
-
-
-
-
-
+    public static void main(String[] args) throws BeanConfigurationException, ClassNotFoundException, IOException, NoSuchFieldException {
+        BeanFactoryFromAnnotations prueba = new BeanFactoryFromAnnotations();
+        prueba.scan("tests");
+        prueba.printBean("HOLAAA");
     }
 }
