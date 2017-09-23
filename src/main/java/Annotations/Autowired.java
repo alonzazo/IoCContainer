@@ -12,9 +12,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Autowired {
     boolean required = false;
-     String value() default "byType";;
+    String value() default "byType";;
     Autowire autowiring = Autowire.byType;
-    String value();
 
 }
 enum Autowire {
