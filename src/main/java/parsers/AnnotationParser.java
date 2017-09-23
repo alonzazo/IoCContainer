@@ -29,7 +29,6 @@ public class AnnotationParser implements Parser {
         id = beanClass.getSimpleName();
         Annotation[] annos = beanClass.getAnnotations();
         if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
-            System.out.println("FUNCIONA MIERDA");
             if (annos.length >= 2 && annos[1].annotationType().getSimpleName().equals("Scope")) {
                 String[] parametter = annos[1].toString().split("\"");
                 switch (parametter[0]) {
@@ -69,7 +68,7 @@ public class AnnotationParser implements Parser {
         }
         else
         {
-            System.out.println("NO ES BEAN");
+            System.out.println("No es bean");
         }
         bean = new Bean(id, isSingleton, beanClass, postCons, preDes,setter);
         bf.addBean(id, bean);
