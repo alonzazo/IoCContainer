@@ -14,6 +14,7 @@ public @interface Autowired {
     boolean required = false;
      String value() default "byType";;
     Autowire autowiring = Autowire.byType;
+    String value();
 
 }
 enum Autowire {
