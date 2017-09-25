@@ -3,79 +3,105 @@ package parsers;
 import containers.AbstractBeanFactory;
 import containers.Bean;
 import containers.BeanFactory;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class AnnotationParser implements Parser {
+    private Set<Class<?>> classes;
 
-    public AnnotationParser()
-    {
+    public AnnotationParser(String pack) {
+        List<ClassLoader> classLoadersList = new LinkedList<>();
+        classLoadersList.add(ClasspathHelper.contextClassLoader());
+        classLoadersList.add(ClasspathHelper.staticClassLoader());
 
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setScanners(new SubTypesScanner(false /* don't exclude Object.class */), new ResourcesScanner())
+                .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
+                .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(pack))));
+
+        classes = reflections.getSubTypesOf(Object.class);
     }
-    public void getBeans(AbstractBeanFactory bf, Class c) throws ClassNotFoundException {
+
+    public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException {
         Bean bean;
-        String id = null, postCons = null, preDes = null, setter = null;
+        String id = null, postCons = null, preDes = null, param;
+        char injectionType = ' ';
         Boolean isSingleton = null;
-        Annotation[] annos = c.getAnnotations();
-        if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
-            if (annos.length >= 2 && annos[1].annotationType().getSimpleName().equals("Scope")) {
-                String[] parameter = annos[1].toString().split("=");
-                switch (parameter[1].substring(0,parameter[1].length()-1)) {
-                    case "Prototype":
-                        isSingleton = false;
-                        break;
-                    case "Singleton":
-                    default:
-                        isSingleton = true;
-                        break;
+        Annotation[] annos;
+        String params[];
+        for (Class c : classes) {
+            id = c.getSimpleName();
+            annos = c.getAnnotations();
+            if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
+                if (annos.length >= 2 && annos[1].annotationType().getSimpleName().equals("Scope")) {
+                    params = annos[1].toString().split("=");
+                    param = params[1].substring(0, params[1].length() - 1);
+                    switch (param) {
+                        case "Prototype":
+                            isSingleton = false;
+                            break;
+                        case "Singleton":
+                            isSingleton = true;
+                            break;
+                        default:
+                            //isSingleton = true;
+                            throw new BeanConfigurationException("Unrecognized scope \""+param+"\" in bean LOL.");
+                    }
+                } else {
+                    isSingleton = true;
                 }
-            } else {
-                isSingleton = true;
-            }
-            Method[] methods = getMethods(c);
-            for (Method method : methods) {
-                Annotation[] methodAnnos = method.getAnnotations();
-                for (Annotation an : methodAnnos) {
-                    String type = an.annotationType().getSimpleName();
-                    switch (type) {
-                        case "Autowired":
-                            String[] parameter = an.toString().split("=");
-                            if(parameter.length != 0 && !parameter[1].substring(0,parameter[1].length()-1).equals("byType"))
-                            {
-                                id = parameter[1].substring(0,parameter[1].length()-1);
-                            }
-                            else
-                            {
-                                id = c.getSimpleName();
-                            }
-                            if (method.getName().contains("set")) {
-                                setter = method.getName();
-                            } else {
-                                setter = null;
-                            }
-                            break;
-                        case "PostInicialization":
-                            postCons = method.getName();
-                            break;
-                        case "PreDestruction":
-                            preDes = method.getName();
-                            break;
+                Method[] methods = c.getMethods();
+                for (Method method : methods) {
+                    Annotation[] methodAnnos = method.getAnnotations();
+                    for (Annotation an : methodAnnos) {
+                        String type = an.annotationType().getSimpleName();
+                        switch (type) {
+                            case "Autowired":
+                                String[] parameter = an.toString().split("=");
+                                if (parameter.length != 0 && !parameter[1].substring(0, parameter[1].length() - 1).equals("byType")) {
+                                    // autowired's parameters name dependencies, NOT the name of the name
+                                    //TODO: save dependencies, both from the parameter of autowired and the parameters of the methods
+                                    //id = parameter[1].substring(0, parameter[1].length() - 1);
+                                } else {
+
+                                }
+                                if (method.getName().contains("set")) {
+                                    injectionType = 's';
+                                } else {
+                                    injectionType = 's';
+                                }
+                                break;
+                            case "PostInicialization":
+                                postCons = method.getName();
+                                break;
+                            case "PreDestruction":
+                                preDes = method.getName();
+                                break;
+                        }
                     }
                 }
+                bean = new Bean(id, injectionType, isSingleton, c, postCons, preDes);
+                bf.addBean(id, bean);
+            } else {
+                // TODO quitar esto
+                System.out.println("Class "+c.getName()+" is not a bean.");
             }
-            bean = new Bean(id, isSingleton, c, postCons, preDes,setter);
-            System.out.println(id);
-            bf.addBean(id, bean);
-        }
-        else {
-            System.out.println("NO ES BEAN");
         }
     }
 
-    private Method[] getMethods(Class c)
+    /*private Method[] getMethods(Class c)
     {
         return c.getMethods();
-    }
+    }*/
 
 }
