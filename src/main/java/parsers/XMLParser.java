@@ -2,8 +2,7 @@ package parsers;
 
 import java.io.IOException;
 
-import containers.BeanFactory;
-import containers.Bean;
+import containers.*;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
@@ -12,6 +11,7 @@ import nu.xom.Element;
 import nu.xom.Elements;
 
 import java.io.File;
+import java.util.LinkedList;
 
 public class XMLParser implements Parser {
     private Document XMLDoc;
@@ -30,8 +30,7 @@ public class XMLParser implements Parser {
         }
     }
 
-    // TODO: parse bean's properties
-    public void getBeans(BeanFactory bf) throws BeanConfigurationException {
+    public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException {
 
         Element root = XMLDoc.getRootElement();
 
@@ -44,18 +43,15 @@ public class XMLParser implements Parser {
         Element currentBean, currentProperty;
         Bean bean;
         // Configuration variables for each bean
-        String id, classString, scope, postCons, preDes, setter;
+        String id, classString, scope, postCons, preDes, propertyRef, propertyVal, propertyName;
         Boolean isSingleton;
+        char injectionType = '$';
         Class beanClass;
+        Property prop;
+        LinkedList<Property> props = new LinkedList<Property>();
 
         for(int i = 0; i < beanElements.size(); i++) {
-            id = null;
-            classString = null;
-            scope= null;
-            postCons = null;
-            preDes = null;
-            setter = null;
-            beanClass = null;
+            props.clear();
 
             currentBean = beanElements.get(i);
             // child elements must be called bean
@@ -70,11 +66,12 @@ public class XMLParser implements Parser {
             // get class, throw exception if not specified or found
             classString = currentBean.getAttributeValue("class");
             if(classString == null)
-                throw new BeanConfigurationException("No class specified for bean "+id+" in XML configuration.");
+                throw new BeanConfigurationException("No class specified for bean \""+id+"\" in XML configuration.");
+
             try {
                 beanClass = Class.forName(classString);
             } catch (ClassNotFoundException e) {
-                throw new BeanConfigurationException("Class "+classString+" of bean "+id+" in XML configuration not found.", e);
+                throw new BeanConfigurationException("Class \""+classString+"\" of bean \""+id+"\" in XML configuration not found.", e);
             }
 
             // get scope, defaults to singleton
@@ -85,7 +82,7 @@ public class XMLParser implements Parser {
             } else if (scope.equals("prototype")) {
                 isSingleton = false;
             } else {
-                throw new BeanConfigurationException("Unrecognized scope "+scope+" for bean "+id+" in XML configuration.");
+                throw new BeanConfigurationException("Unrecognized scope \""+scope+"\" for bean \""+id+"\" in XML configuration.");
             }
 
             // get constructor and destructor methods, fields are not required so no exception handling necessary
@@ -96,12 +93,66 @@ public class XMLParser implements Parser {
             properties = currentBean.getChildElements();
             for(int j = 0; j < properties.size(); j++) {
                 // TODO: get property logic
+                currentProperty = properties.get(j);
+                prop = new Property();
+                injectionType = '$';
+
+                if(currentProperty.getLocalName().equals("property") && injectionType == 'c' || currentProperty.getLocalName().equals("property") && injectionType == 's') {
+                    // injectionType is set as constructor but received a property
+                    // or injectionType is set as setter but received a constructor argument
+                    throw new BeanConfigurationException("Defined both constructor arguments and properties for bean \""+id+"\" in XML configuration.");
+                } else if(currentProperty.getLocalName().equals("property")) {
+                    // injecting with setter
+                    injectionType = 's';
+
+                    // get name of property
+                    propertyName = currentProperty.getAttributeValue("name");
+                    if(propertyName != null) {
+                        prop.setName(propertyName);
+                    } else {
+                        // properties must have a name
+                        throw new BeanConfigurationException("No name specified for a property of bean \""+id+"\" in XML configuration.");
+                    }
+
+                    propertyRef = currentProperty.getAttributeValue("ref");
+                    propertyVal = currentProperty.getAttributeValue("value");
+
+                    if(propertyRef == null && propertyVal == null) {
+                        // each property must have either a reference or value
+                        throw new BeanConfigurationException("No value or reference specified for property \""
+                                +propertyName+"\" of bean \""+id+"\" in XML configuration.");
+                    } else if(propertyRef != null && propertyVal != null){
+                        // properties can't have both reference and value
+                        throw new BeanConfigurationException("Specified both reference and value for property \""
+                                +propertyName+"\" of bean \""+id+"\" in XML configuration.");
+                    } else if(propertyRef != null) {
+                        prop.setRef(propertyRef);
+                        prop.setValue(null);
+                    } else {
+                        prop.setValue(propertyVal);
+                        prop.setRef(null);
+                    }
+                } else if(currentProperty.getLocalName().equals("constructor-arg")) {
+                    // injecting with constructor
+                    injectionType = 'c';
+
+                    propertyRef = currentProperty.getAttributeValue("ref");
+
+                    if(propertyRef == null) {
+                        throw new BeanConfigurationException("No reference provided for constructor argument of bean \""+id+"\"in XML configuration.");
+                    } else {
+                        prop.setRef(propertyRef);
+                        prop.setValue(null);
+                    }
+                }
+
+                props.add(prop);
             }
 
-            // TODO: remove null parameter
-            bean = new Bean(id, isSingleton, beanClass, postCons, preDes, null);
+            bean = new Bean(id, injectionType, isSingleton, beanClass, postCons, preDes, props);
             bf.addBean(id, bean);
         }
+
     }
 
 }
