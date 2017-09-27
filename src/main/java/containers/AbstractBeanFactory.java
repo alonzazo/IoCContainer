@@ -19,7 +19,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
     public void addBean(String key, Bean bean) throws BeanConfigurationException{
         if (beans.containsKey(key)) {
-            throw new BeanConfigurationException("Multiple definitions for bean: "+key);
+            throw new BeanConfigurationException("Multiple definitions of bean: \""+key+"\".");
         } else {
             beans.put(key, bean);
         }
@@ -37,19 +37,18 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         return str;
     }
 
-    //TODO bean injection
     public Object getBean(String name) throws BeanConfigurationException{
 
-        Bean bean;
-        Object b = null;
+        Bean bean, dependency;
+        Object newInstance = null;
         if((bean = beans.get(name)) == null)
             throw new BeanConfigurationException("Undefined bean \""+name+"\".");
 
-        // if singleton
-        if(bean.isSingleton())
+        // if singleton and has been initialized
+        if(bean.isSingleton() && bean.getSingletonInstance() != null)
             return bean.getSingletonInstance();
 
-        // if prototype
+        // if prototype or singleton has not been initialized
         // prepare dependencies
         LinkedList<Object> dependencies = new LinkedList<>();
         LinkedList<Class> dependencyTypes = new LinkedList<>();
@@ -58,41 +57,60 @@ public abstract class AbstractBeanFactory implements BeanFactory {
             if(prop.getRef() != null) {
                 // recursive
                 dependencies.add(getBean(prop.getRef()));
+                dependencyTypes.add(beans.get(prop.getRef()).getBeanClass());
             } else {
                 dependencies.add(prop.getInstance());
+                dependencyTypes.add(prop.getType());
             }
-            // get type of dependency
-            dependencyTypes.add(prop.getClass());
         }
 
-
-        // scope is prototype, instantiate new bean
+        // instantiate new bean
         if(bean.getInjectionType() == 'c') {
             // constructor injection
             Constructor cons = null;
             try {
-                cons = bean.getBeanClass().getDeclaredConstructor((Class<?>[]) dependencyTypes.toArray());
+                Class[] pls = new Class[dependencyTypes.size()];
+                cons = bean.getBeanClass().getDeclaredConstructor((Class[]) dependencyTypes.toArray(pls));
             } catch (NoSuchMethodException e) {
-                throw new BeanConfigurationException("", e);
+                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
             }
 
             try {
-                b = cons.newInstance(dependencies.toArray());
-            } catch (InstantiationException e) {
-                e.printStackTrace();
+                newInstance = cons.newInstance(dependencies.toArray());
+            } catch (InstantiationException e) { //TODO ERROR MESAGES
+                throw new BeanConfigurationException("", e);
             } catch (IllegalAccessException e) {
+                throw new BeanConfigurationException("", e);
+            } catch (InvocationTargetException e) {
+                throw new BeanConfigurationException("", e);
+            }
+
+        } else {
+            // TODO setter injection
+
+        }
+
+        // run post construction method if necessary
+        if(bean.getPostConstruct() != null) {
+            try {
+                bean.getPostConstruct().invoke(newInstance);
+            } catch (IllegalAccessException e) { //TODO ERROR MESSAGES
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-
-        } else {
-            // setter injection
-
         }
 
+        // if initializing singleton for the first time, set the instance
+        if(bean.isSingleton()) {
+            bean.setSingletonInstance(newInstance);
+        }
 
-
-        return b;
+        return newInstance;
     }
+
+    private void setDependencies() {
+
+    }
+
 }
