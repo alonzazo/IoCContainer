@@ -36,7 +36,8 @@ public class AnnotationParser implements Parser {
 
     public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException {
         Bean bean;
-        String id = null, postCons = null, preDes = null, param;
+        String id = null, param;
+        Method postCons = null, preDes = null;
         char injectionType = ' ';
         Boolean isSingleton = null;
         Annotation[] annos;
@@ -83,10 +84,10 @@ public class AnnotationParser implements Parser {
                                 }
                                 break;
                             case "PostInicialization":
-                                postCons = method.getName();
+                                postCons = method;
                                 break;
                             case "PreDestruction":
-                                preDes = method.getName();
+                                preDes = method;
                                 break;
                         }
                     }
