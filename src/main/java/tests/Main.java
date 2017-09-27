@@ -34,7 +34,18 @@ public class Main {
 
         System.out.println("XML:");
         BeanFactory xmlBF = new BeanFactoryFromXML();
-        xmlBF.scan("C:\\Users\\b53779\\Desktop\\ERNIE.txt");
+
+        // EL XML ESTA EN RESOURCES, CAMBIEN EL PATH PARA PODER TESTEAR
+        xmlBF.scan("C:\\Users\\Roberto\\IdeaProjects\\Container\\src\\main\\resources\\UNIQUENAME.xml");
         System.out.println(xmlBF.printBeans());
+
+        Hey hey = (Hey) xmlBF.getBean("heyBean");
+
+        hey.funciono();
+        System.out.println(hey.testSingleton);
+        hey.changeTestSingleton();
+
+        Hey hey2 = (Hey) xmlBF.getBean("heyBean");
+        System.out.println(hey2.testSingleton);
     }
 }

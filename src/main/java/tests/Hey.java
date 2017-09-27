@@ -2,6 +2,7 @@ package tests;
 
 import Annotations.*;
 import com.sun.org.glassfish.external.probe.provider.annotations.Probe;
+import containers.Bean;
 
 import javax.annotation.Resource;
 import javax.xml.ws.Action;
@@ -9,28 +10,37 @@ import java.lang.annotation.Target;
 
 
 @Component
-@Scope("Singleton")
+@Scope("Prototype")
 //@Resource
 public class Hey {
-    String hola;
-    String lalo;
+    Hi injectThisPls;
 
-    public Hey()
-    {
+    String testSingleton = "at first it says this";
 
-    }
-
-    @Autowired/*("HOLAAA")*/
-    public void setHolaetHola(String hi)
-    {
-        this.hola = hi;
+    public Hey(Hi plsInject) {
+        injectThisPls = plsInject;
     }
 
     @PostInicialization
-    public void setCasa(String tu) {
-        this.lalo = tu;
+    public void start() {
+        System.out.println("SIRVE POST CONSTRUCTION");
     }
 
     @PreDestruction
-    public void destroy(){}
+    public void end(){
+        System.out.println("SIRVE PRE DESCTRUCT");
+    }
+
+    public void funciono() {
+        injectThisPls.funciono();
+        System.out.println("HEY SIRVIÓ");
+    }
+
+    public String getTestSingleton() {
+        return testSingleton;
+    }
+
+    public void changeTestSingleton() {
+        testSingleton = "but now it says this instead";
+    }
 }
