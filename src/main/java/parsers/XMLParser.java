@@ -11,6 +11,8 @@ import nu.xom.Element;
 import nu.xom.Elements;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 
 public class XMLParser implements Parser {
@@ -43,15 +45,19 @@ public class XMLParser implements Parser {
         Element currentBean, currentProperty;
         Bean bean;
         // Configuration variables for each bean
-        String id, classString, scope, postCons, preDes, propertyRef, propertyVal, propertyName;
+        String id, classString, scope, postConsS, preDesS, propertyRef, propertyVal, propertyName, propertyType;
         Boolean isSingleton;
         char injectionType = '$';
         Class beanClass;
         Property prop;
+        Field propertyField;
+        Method postCons = null, preDes = null;
         LinkedList<Property> props = new LinkedList<Property>();
 
         for(int i = 0; i < beanElements.size(); i++) {
             props.clear();
+            postCons = null;
+            preDes = null;
 
             currentBean = beanElements.get(i);
             // child elements must be called bean
@@ -86,66 +92,163 @@ public class XMLParser implements Parser {
             }
 
             // get constructor and destructor methods, fields are not required so no exception handling necessary
-            postCons = currentBean.getAttributeValue("post-construct");
-            preDes = currentBean.getAttributeValue("pre-destroy");
+            if((postConsS = currentBean.getAttributeValue("post-construct")) != null) {
+                try{
+                    postCons = beanClass.getDeclaredMethod(postConsS);
+                }catch (NoSuchMethodException e) {
+                    throw new BeanConfigurationException("Unrecognized post-construct method \""+postConsS+"\" in bean \""+id+"\" in XML configuration.",e);
+                }
+            }
+
+            if((preDesS = currentBean.getAttributeValue("pre-destruct")) != null) {
+                try{
+                    preDes = beanClass.getDeclaredMethod(preDesS);
+                }catch (NoSuchMethodException e) {
+                    throw new BeanConfigurationException("Unrecognized pre-construct method \""+postConsS+"\" in bean \""+id+"\" in XML configuration.",e);
+                }
+            }
 
             // get properties
             properties = currentBean.getChildElements();
+            injectionType = '$';
             for(int j = 0; j < properties.size(); j++) {
-                // TODO: get property logic
                 currentProperty = properties.get(j);
                 prop = new Property();
-                injectionType = '$';
 
-                if(currentProperty.getLocalName().equals("property") && injectionType == 'c' || currentProperty.getLocalName().equals("property") && injectionType == 's') {
+                if(currentProperty.getLocalName().equals("property") && injectionType == 'c' || currentProperty.getLocalName().equals("constructor-arg") && injectionType == 's') {
                     // injectionType is set as constructor but received a property
                     // or injectionType is set as setter but received a constructor argument
                     throw new BeanConfigurationException("Defined both constructor arguments and properties for bean \""+id+"\" in XML configuration.");
                 } else if(currentProperty.getLocalName().equals("property")) {
                     // injecting with setter
                     injectionType = 's';
-
-                    // get name of property
-                    propertyName = currentProperty.getAttributeValue("name");
-                    if(propertyName != null) {
-                        prop.setName(propertyName);
-                    } else {
-                        // properties must have a name
-                        throw new BeanConfigurationException("No name specified for a property of bean \""+id+"\" in XML configuration.");
-                    }
-
-                    propertyRef = currentProperty.getAttributeValue("ref");
-                    propertyVal = currentProperty.getAttributeValue("value");
-
-                    if(propertyRef == null && propertyVal == null) {
-                        // each property must have either a reference or value
-                        throw new BeanConfigurationException("No value or reference specified for property \""
-                                +propertyName+"\" of bean \""+id+"\" in XML configuration.");
-                    } else if(propertyRef != null && propertyVal != null){
-                        // properties can't have both reference and value
-                        throw new BeanConfigurationException("Specified both reference and value for property \""
-                                +propertyName+"\" of bean \""+id+"\" in XML configuration.");
-                    } else if(propertyRef != null) {
-                        prop.setRef(propertyRef);
-                        prop.setValue(null);
-                    } else {
-                        prop.setValue(propertyVal);
-                        prop.setRef(null);
-                    }
-                } else if(currentProperty.getLocalName().equals("constructor-arg")) {
+                }  else if(currentProperty.getLocalName().equals("constructor-arg")) {
                     // injecting with constructor
                     injectionType = 'c';
-
-                    propertyRef = currentProperty.getAttributeValue("ref");
-
-                    if(propertyRef == null) {
-                        throw new BeanConfigurationException("No reference provided for constructor argument of bean \""+id+"\"in XML configuration.");
-                    } else {
-                        prop.setRef(propertyRef);
-                        prop.setValue(null);
-                    }
                 }
 
+                // get name of property
+                propertyName = currentProperty.getAttributeValue("name");
+                if (propertyName != null) {
+                    prop.setName(propertyName);
+                } else {
+                    // properties must have a name
+                    throw new BeanConfigurationException("No name specified for a property of bean \"" + id + "\" in XML configuration.");
+                }
+
+                // get ref/value
+                propertyRef = currentProperty.getAttributeValue("ref");
+                propertyVal = currentProperty.getAttributeValue("value");
+
+                if(propertyRef == null && propertyVal == null) {
+                    // each property must have either a reference or value
+                    throw new BeanConfigurationException("No value or reference specified for property \""
+                            +propertyName+"\" of bean \""+id+"\" in XML configuration.");
+                } else if(propertyRef != null && propertyVal != null){
+                    // properties can't have both reference and value
+                    throw new BeanConfigurationException("Specified both reference and value for property \""
+                            +propertyName+"\" of bean \""+id+"\" in XML configuration.");
+                } else if(propertyRef != null) {
+                    prop.setRef(propertyRef);
+                    prop.setValue(null);
+                } else {
+                    prop.setValue(propertyVal);
+                    prop.setRef(null);
+
+                    // get class of property
+                    try {
+                        propertyField = beanClass.getDeclaredField(propertyName);
+                    } catch (NoSuchFieldException e) {
+                        throw new BeanConfigurationException("Property \""+propertyName+"\" undeclared in bean \""+id+"\" of class \""+beanClass.getName()+"\".",e);
+                    }
+                    prop.setType(propertyField.getType());
+
+                    // instantiate from value given in string to the type of the field
+                    // could be any java primitive + string
+                    propertyType = propertyField.getType().getSimpleName();
+                    switch(propertyType) {
+                        case "String":
+                            prop.setInstance(propertyVal);
+                            break;
+
+                        case "char":
+                            if(propertyVal.length() == 1) {
+                                prop.setInstance(propertyVal.charAt(0));
+                            } else {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("");
+                            }
+                            break;
+
+                        case "boolean":
+                            if(propertyVal.equals("true")) {
+                                prop.setInstance(true);
+                            } else if (propertyVal.equals("false")) {
+                                prop.setInstance(false);
+                            } else {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("");
+                            }
+                            break;
+
+                        case "long":
+                            try {
+                                prop.setInstance(Long.parseLong(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        case "int":
+                            try {
+                                prop.setInstance(Integer.parseInt(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        case "short":
+                            try {
+                                prop.setInstance(Short.parseShort(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        case "byte":
+                            try {
+                                prop.setInstance(Byte.parseByte(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        case "float":
+                            try {
+                                prop.setInstance(Float.parseFloat(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        case "double":
+                            try {
+                                prop.setInstance(Double.parseDouble(propertyVal));
+                            } catch(NumberFormatException e) {
+                                //TODO ERROR MESSAGE
+                                throw new BeanConfigurationException("",e);
+                            }
+                            break;
+
+                        default:
+                            throw new BeanConfigurationException("Property \""+propertyName+"\" of bean \""+id+"\" was given a value but is not a primitive.");
+                    }
+                }
                 props.add(prop);
             }
 
