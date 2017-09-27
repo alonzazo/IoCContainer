@@ -4,7 +4,7 @@ import parsers.BeanConfigurationException;
 public interface BeanFactory {
     void scan(String s) throws BeanConfigurationException;
     void addBean(String name, Bean bean) throws BeanConfigurationException;
-    Object getBean(String name);
+    Object getBean(String name) throws BeanConfigurationException;
     String printBean(String key);
     String printBeans();
 }

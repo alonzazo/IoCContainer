@@ -34,7 +34,7 @@ public class Main {
 
         System.out.println("XML:");
         BeanFactory xmlBF = new BeanFactoryFromXML();
-        xmlBF.scan("C:\\Users\\Roberto\\Desktop\\UNIQUENAME.xml");
+        xmlBF.scan("C:\\Users\\b53779\\Desktop\\ERNIE.txt");
         System.out.println(xmlBF.printBeans());
     }
 }

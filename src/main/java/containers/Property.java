@@ -6,7 +6,7 @@ public class Property {
     private Object instance;
     private String ref;
     private String value;
-
+    private Class type;
 
     public Property() {}
 
@@ -15,11 +15,15 @@ public class Property {
     }
 
     public void setValue(String value) {
-        this.value = value;
-    }
+            this.value = value;
+        }
 
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    public void setInstance(Object instance) {
+        this.instance = instance;
     }
 
     public String getName() {
@@ -32,6 +36,10 @@ public class Property {
 
     public String getRef() {
         return ref;
+    }
+
+    public Object getInstance() {
+        return instance;
     }
 
     public String toString() {

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 public class Bean {
 
-    private LinkedList<Property> properties;
+    private LinkedList<Property> properties ;
     private Object singletonInstance;
     private String name;
     private Boolean singleton;
@@ -12,6 +12,7 @@ public class Bean {
     private Class beanClass;
     private String postConstruct;
     private String preDestruct;
+
 
     public Bean() {}
 
@@ -39,6 +40,10 @@ public class Bean {
         name = n;
     }
 
+    public void setSingletonInstance(Object singletonInstance) {
+        this.singletonInstance = singletonInstance;
+    }
+
     public void setSingleton(Boolean singleton) {
         this.singleton = singleton;
     }
@@ -63,6 +68,10 @@ public class Bean {
         return name;
     }
 
+    public Object getSingletonInstance() {
+        return singletonInstance;
+    }
+
     public Boolean isSingleton() {
         return singleton;
     }
@@ -81,6 +90,10 @@ public class Bean {
 
     public char getInjectionType() {
         return injectionType;
+    }
+
+    public LinkedList<Property> getProperties() {
+        return properties;
     }
 
     public String toString() {

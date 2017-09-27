@@ -20,10 +20,12 @@ public class AnnotationParser implements Parser {
     private Set<Class<?>> classes;
 
     public AnnotationParser(String pack) {
+        // stackoverflow
         List<ClassLoader> classLoadersList = new LinkedList<>();
         classLoadersList.add(ClasspathHelper.contextClassLoader());
         classLoadersList.add(ClasspathHelper.staticClassLoader());
 
+        // stackoverflow
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setScanners(new SubTypesScanner(false /* don't exclude Object.class */), new ResourcesScanner())
                 .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
@@ -54,7 +56,6 @@ public class AnnotationParser implements Parser {
                             isSingleton = true;
                             break;
                         default:
-                            //isSingleton = true;
                             throw new BeanConfigurationException("Unrecognized scope \""+param+"\" in bean LOL.");
                     }
                 } else {
@@ -70,7 +71,7 @@ public class AnnotationParser implements Parser {
                                 String[] parameter = an.toString().split("=");
                                 if (parameter.length != 0 && !parameter[1].substring(0, parameter[1].length() - 1).equals("byType")) {
                                     // autowired's parameters name dependencies, NOT the name of the name
-                                    //TODO: save dependencies, both from the parameter of autowired and the parameters of the methods
+                                    //TODO: save dependencies of the methods, read autowired parameters
                                     //id = parameter[1].substring(0, parameter[1].length() - 1);
                                 } else {
 
@@ -78,7 +79,7 @@ public class AnnotationParser implements Parser {
                                 if (method.getName().contains("set")) {
                                     injectionType = 's';
                                 } else {
-                                    injectionType = 's';
+                                    injectionType = 'c';
                                 }
                                 break;
                             case "PostInicialization":
