@@ -1,6 +1,7 @@
 package containers;
 
 import java.util.LinkedList;
+import java.lang.reflect.Method;
 
 public class Bean {
 
@@ -10,30 +11,30 @@ public class Bean {
     private Boolean singleton;
     private char injectionType;
     private Class beanClass;
-    private String postConstruct;
-    private String preDestruct;
+    private Method postConstruct;
+    private Method preDestruct;
 
 
     public Bean() {}
 
-    public Bean(String n, char injection, Boolean single, Class bClass, String post, String pre, LinkedList<Property> props) {
+    public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre, LinkedList<Property> props) {
         name = n;
         singleton = single;
         injectionType = injection;
         beanClass = bClass;
         postConstruct = post;
         preDestruct = pre;
-        properties = new LinkedList<Property>(props);
+        properties = new LinkedList(props);
     }
 
-    public Bean(String n, char injection, Boolean single, Class bClass, String post, String pre) {
+    public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre) {
         name = n;
         singleton = single;
         injectionType = injection;
         beanClass = bClass;
         postConstruct = post;
         preDestruct = pre;
-        properties = new LinkedList<Property>();
+        properties = new LinkedList();
     }
 
     public void setName(String n) {
@@ -52,11 +53,11 @@ public class Bean {
         beanClass = bClass;
     }
 
-    public void setPostConstruct(String post) {
+    public void setPostConstruct(Method post) {
         postConstruct = post;
     }
 
-    public void setPreDestruct(String pre) {
+    public void setPreDestruct(Method pre) {
         preDestruct = pre;
     }
 
@@ -80,11 +81,11 @@ public class Bean {
         return beanClass;
     }
 
-    public String getPostConstruct() {
+    public Method getPostConstruct() {
         return postConstruct;
     }
 
-    public String getPreDestruct() {
+    public Method getPreDestruct() {
         return preDestruct;
     }
 
