@@ -22,6 +22,10 @@ public class Property {
         this.ref = ref;
     }
 
+    public void setType(Class type) {
+        this.type = type;
+    }
+
     public void setInstance(Object instance) {
         this.instance = instance;
     }
@@ -45,10 +49,14 @@ public class Property {
     public String toString() {
         String str = "  Property name: "+name;
         if(value != null) {
-            str += "\n  value: "+value;
+            str += "\n  value: "+value+"\n  instance: "+instance;
         } else if (ref != null) {
             str += "\n  ref: "+ref;
         }
         return str;
+    }
+
+    public Class getType() {
+        return type;
     }
 }
