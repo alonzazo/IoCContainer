@@ -36,8 +36,8 @@ public class Main {
         BeanFactory xmlBF = new BeanFactoryFromXML();
 
         // EL XML ESTA EN RESOURCES, CAMBIEN EL PATH PARA PODER TESTEAR
-        xmlBF.scan("C:\\Users\\Roberto\\IdeaProjects\\Container\\src\\main\\resources\\UNIQUENAME.xml");
-        System.out.println(xmlBF.printBeans());
+        xmlBF.scan("src\\main\\resources\\UNIQUENAME.xml");
+        //System.out.println(xmlBF.printBeans());
 
         Hey hey = (Hey) xmlBF.getBean("heyBean");
 
@@ -47,5 +47,17 @@ public class Main {
 
         Hey hey2 = (Hey) xmlBF.getBean("heyBean");
         System.out.println(hey2.testSingleton);
+
+        System.out.println("SE VA A CERRAR EL CONTAINER");
+
+        /*xmlBF.close();
+
+        System.out.println("SE CERRó EL CONTAINER");
+
+        try {
+            hey = (Hey) xmlBF.getBean("heyBean");
+        } catch(BeanConfigurationException e) {
+            System.out.println("FUNCIONA CLOSE");
+        }*/
     }
 }

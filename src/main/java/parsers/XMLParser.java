@@ -19,7 +19,8 @@ public class XMLParser implements Parser {
     private Document XMLDoc;
 
     public XMLParser(String XMLPath) throws BeanConfigurationException {
-        File XMLFile = new File(XMLPath);
+        // añadir en doc que recibe path relativo
+        File XMLFile = new File(".\\"+XMLPath);
         Builder bd = new Builder(false);
         try {
             XMLDoc = bd.build(XMLFile);
@@ -53,6 +54,7 @@ public class XMLParser implements Parser {
         Field propertyField;
         Method postCons = null, preDes = null;
         LinkedList<Property> props = new LinkedList<Property>();
+        Class[] parameterTypes;
 
         for(int i = 0; i < beanElements.size(); i++) {
             props.clear();
@@ -253,6 +255,20 @@ public class XMLParser implements Parser {
             }
 
             bean = new Bean(id, injectionType, isSingleton, beanClass, postCons, preDes, props);
+
+            if(injectionType == 's') {
+                for (Property p : props) {
+                    for (Method method : beanClass.getMethods()) {
+                        if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
+                            bean.addInjector(p.getType(),method);
+                        }
+                    }
+                }
+            } else {
+                // TODO AGARRAR EL CONSTRUCTOR
+            }
+
+
             bf.addBean(id, bean);
         }
 

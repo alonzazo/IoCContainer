@@ -1,20 +1,20 @@
 <beans>
 
-    <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destroy="end" scope="singleton">
+    <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destruct="end" scope="singleton">
         <constructor-arg name="injectThisPls" ref="hiBean"/>
     </bean>
 	
 	<bean id="hiBean" class="tests.Hi" scope="prototype">
-		<constructor-arg name="by" value="33"/>
-		<constructor-arg name="sh" value="92"/>
-		<constructor-arg name="in" value="3"/>
-		<constructor-arg name="lo" value="4"/>
-		<constructor-arg name="fl" value="1.1"/>
-		<constructor-arg name="dou" value="2.2"/>
-		<constructor-arg name="tru" value="true"/>
-		<constructor-arg name="fal" value="false"/>
-		<constructor-arg name="ch" value="$"/>
-		<constructor-arg name="str" value="SE INYECTÓ ESTO"/>
+		<property name="by" value="33"/>
+		<property name="sh" value="92"/>
+		<property name="in" value="3"/>
+		<property name="lo" value="4"/>
+		<property name="fl" value="1.1"/>
+		<property name="dou" value="2.2"/>
+		<property name="tru" value="true"/>
+		<property name="fal" value="false"/>
+		<property name="ch" value="$"/>
+		<property name="str" value="SE INYECTÓ ESTO"/>
 	</bean>
 
 </beans>

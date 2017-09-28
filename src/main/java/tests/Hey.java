@@ -9,7 +9,7 @@ import javax.xml.ws.Action;
 import java.lang.annotation.Target;
 
 
-@Component
+@Component("heyBean")
 @Scope("Prototype")
 //@Resource
 public class Hey {
@@ -29,6 +29,10 @@ public class Hey {
     @PreDestruction
     public void end(){
         System.out.println("SIRVE PRE DESCTRUCT");
+    }
+
+    public void setHi(Hi hi) {
+        injectThisPls = hi;
     }
 
     public void funciono() {

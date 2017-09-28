@@ -5,6 +5,7 @@ import parsers.Parser;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -41,6 +42,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
         Bean bean, dependency;
         Object newInstance = null;
+        Class[] size;
         if((bean = beans.get(name)) == null)
             throw new BeanConfigurationException("Undefined bean \""+name+"\".");
 
@@ -69,8 +71,8 @@ public abstract class AbstractBeanFactory implements BeanFactory {
             // constructor injection
             Constructor cons = null;
             try {
-                Class[] pls = new Class[dependencyTypes.size()];
-                cons = bean.getBeanClass().getDeclaredConstructor((Class[]) dependencyTypes.toArray(pls));
+                size = new Class[dependencyTypes.size()];
+                cons = bean.getBeanClass().getDeclaredConstructor((Class[]) dependencyTypes.toArray(size));
             } catch (NoSuchMethodException e) {
                 throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
             }
@@ -87,7 +89,25 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
         } else {
             // TODO setter injection
+            try {
+                newInstance = bean.getBeanClass().newInstance();
+            } catch (InstantiationException e) { //TODO ERROR MESSAGE
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
 
+            for(int i = 0; i < dependencyTypes.size(); i++) {
+
+                Method injector = bean.getInjector(dependencyTypes.get(i));
+                try {
+                    injector.invoke(newInstance, dependencies.get(i));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         // run post construction method if necessary
@@ -107,6 +127,23 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         }
 
         return newInstance;
+    }
+
+     public void close() {
+
+        for(Bean bean : beans.values()) {
+            if(bean.isSingleton() && bean.getPreDestruct() != null) {
+                try {
+                    bean.getPreDestruct().invoke(bean.getSingletonInstance());
+                } catch (IllegalAccessException e) { //TODO ERROR MESSAGES
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        beans.clear();
     }
 
     private void setDependencies() {

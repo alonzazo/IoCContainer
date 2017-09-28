@@ -1,5 +1,6 @@
 package containers;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.lang.reflect.Method;
 
@@ -13,7 +14,7 @@ public class Bean {
     private Class beanClass;
     private Method postConstruct;
     private Method preDestruct;
-
+    private HashMap<Class,Method> injectors;
 
     public Bean() {}
 
@@ -25,6 +26,7 @@ public class Bean {
         postConstruct = post;
         preDestruct = pre;
         properties = new LinkedList(props);
+        injectors = new HashMap<>();
     }
 
     public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre) {
@@ -35,6 +37,15 @@ public class Bean {
         postConstruct = post;
         preDestruct = pre;
         properties = new LinkedList();
+        injectors = new HashMap<>();
+    }
+
+    public void addInjector(Class c,Method m){
+        injectors.put(c,m);
+    }
+
+    public Method getInjector(Class c){
+        return injectors.get(c);
     }
 
     public void setName(String n) {
@@ -98,7 +109,7 @@ public class Bean {
     }
 
     public String toString() {
-        String str = "Bean name: "+name+"\nType: "+beanClass+"\nScope: ";
+        String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
         if(isSingleton()) {
             str+="singleton";
         } else {

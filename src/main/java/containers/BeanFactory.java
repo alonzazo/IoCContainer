@@ -7,4 +7,5 @@ public interface BeanFactory {
     Object getBean(String name) throws BeanConfigurationException;
     String printBean(String key);
     String printBeans();
+    void close();
 }

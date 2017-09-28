@@ -1,9 +1,11 @@
 package tests;
 
+import Annotations.Autowired;
 import Annotations.Component;
 
 @Component
 public class Hi {
+
     byte by;
     short sh;
     int in;
@@ -14,6 +16,11 @@ public class Hi {
     boolean fal;
     char ch;
     String str;
+
+    public Hi() {
+
+    }
+
 
     public Hi(byte b, short s, int i, long l, float f, double d, boolean t, boolean fa, char c, String st){
         by = b;
@@ -26,6 +33,47 @@ public class Hi {
         fal = fa;
         ch = c;
         str = st;
+    }
+
+    @Autowired("heyBean")
+    public void setBy(byte by) {
+        this.by = by;
+    }
+
+    public void setSh(short sh) {
+        this.sh = sh;
+    }
+
+    public void setIn(int in) {
+        this.in = in;
+    }
+
+    public void setLo(long lo) {
+        this.lo = lo;
+    }
+
+    public void setFl(float fl) {
+        this.fl = fl;
+    }
+
+    public void setDou(double dou) {
+        this.dou = dou;
+    }
+
+    public void setTru(boolean tru) {
+        this.tru = tru;
+    }
+
+    public void setFal(boolean fal) {
+        this.fal = fal;
+    }
+
+    public void setCh(char ch) {
+        this.ch = ch;
+    }
+
+    public void setStr(String str) {
+        this.str = str;
     }
 
     public void funciono() {
