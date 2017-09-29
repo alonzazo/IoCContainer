@@ -13,6 +13,7 @@ public class Hi {
     float fl;
     double dou;
     boolean tru;
+
     boolean fal;
     char ch;
     String str;
@@ -35,7 +36,7 @@ public class Hi {
         str = st;
     }
 
-    @Autowired("heyBean")
+    @Autowired
     public void setBy(byte by) {
         this.by = by;
     }

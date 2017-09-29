@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class Main {
     public static void main(String[] args) throws BeanConfigurationException, ClassNotFoundException, IOException, NoSuchFieldException {
-        System.out.println("ANNOTATIONS:");
+        /*System.out.println("ANNOTATIONS:");
         BeanFactory annoBF = new BeanFactoryFromAnnotations();
         try {
             annoBF.scan("tests");
@@ -32,7 +32,7 @@ public class Main {
         }
         System.out.println(annoBF.printBeans()+"\n\n");
 
-        System.out.println("XML:");
+        System.out.println("XML:");*/
         BeanFactory xmlBF = new BeanFactoryFromXML();
 
         // EL XML ESTA EN RESOURCES, CAMBIEN EL PATH PARA PODER TESTEAR

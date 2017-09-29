@@ -15,7 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 
-public class XMLParser implements Parser {
+public class XMLParser extends AbstractParser {
     private Document XMLDoc;
 
     public XMLParser(String XMLPath) throws BeanConfigurationException {
@@ -260,7 +260,7 @@ public class XMLParser implements Parser {
                 for (Property p : props) {
                     for (Method method : beanClass.getMethods()) {
                         if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
-                            bean.addInjector(p.getType(),method);
+                            bean.addSetter(p.getType(),method);
                         }
                     }
                 }

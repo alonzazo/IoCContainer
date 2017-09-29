@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class AnnotationParser implements Parser {
+public class AnnotationParser extends AbstractParser {
     private Set<Class<?>> classes;
 
     public AnnotationParser(String pack) {

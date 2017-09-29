@@ -9,7 +9,7 @@ import javax.xml.ws.Action;
 import java.lang.annotation.Target;
 
 
-@Component("heyBean")
+@Component
 @Scope("Prototype")
 //@Resource
 public class Hey {

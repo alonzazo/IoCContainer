@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 public @interface Autowired {
     boolean required = false;
     String value() default "byType";
-    String name();
+    //String name();
     Autowire autowiring = Autowire.byType;
 
 }

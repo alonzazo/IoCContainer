@@ -1,5 +1,6 @@
 package containers;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.lang.reflect.Method;
@@ -14,7 +15,26 @@ public class Bean {
     private Class beanClass;
     private Method postConstruct;
     private Method preDestruct;
-    private HashMap<Class,Method> injectors;
+    private HashMap<Class,Method> setters;
+    private boolean byName;
+
+    public Constructor getConstructor() {
+        return constructor;
+    }
+
+    public void setConstructor(Constructor constructor) {
+        this.constructor = constructor;
+    }
+
+    private Constructor constructor;
+
+    public boolean isByName() {
+        return byName;
+    }
+
+    public void setByName(boolean byName) {
+        this.byName = byName;
+    }
 
     public Bean() {}
 
@@ -26,7 +46,7 @@ public class Bean {
         postConstruct = post;
         preDestruct = pre;
         properties = new LinkedList(props);
-        injectors = new HashMap<>();
+        setters = new HashMap<>();
     }
 
     public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre) {
@@ -37,15 +57,27 @@ public class Bean {
         postConstruct = post;
         preDestruct = pre;
         properties = new LinkedList();
-        injectors = new HashMap<>();
+        setters = new HashMap<>();
     }
 
-    public void addInjector(Class c,Method m){
-        injectors.put(c,m);
+    public Bean(String n, char injection, Boolean single, boolean by ,Class bClass, Method post, Method pre,LinkedList<Property> props) {
+        name = n;
+        singleton = single;
+        injectionType = injection;
+        beanClass = bClass;
+        postConstruct = post;
+        preDestruct = pre;
+        byName = by;
+        properties = new LinkedList(props);
+        setters = new HashMap<>();
     }
 
-    public Method getInjector(Class c){
-        return injectors.get(c);
+    public void addSetter(Class c,Method m){
+        setters.put(c,m);
+    }
+
+    public Method getSetter(Class c){
+        return setters.get(c);
     }
 
     public void setName(String n) {
