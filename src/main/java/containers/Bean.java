@@ -10,7 +10,7 @@ public class Bean {
     private LinkedList<Property> properties ;
     private Object singletonInstance;
     private String name;
-    private Boolean singleton;
+    private boolean singleton;
     private char injectionType;
     private Class beanClass;
     private Method postConstruct;
@@ -60,7 +60,7 @@ public class Bean {
         setters = new HashMap<>();
     }
 
-    public Bean(String n, char injection, Boolean single, boolean by ,Class bClass, Method post, Method pre,LinkedList<Property> props) {
+    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,LinkedList<Property> props) {
         name = n;
         singleton = single;
         injectionType = injection;
@@ -142,10 +142,16 @@ public class Bean {
 
     public String toString() {
         String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
-        if(isSingleton()) {
+        if(singleton) {
             str+="singleton";
         } else {
             str+="prototype";
+        }
+        str += "\nAutowiring mode: ";
+        if(byName) {
+            str+="byName";
+        } else {
+            str+="byType";
         }
         str += "\nInjection type: ";
         if(injectionType=='c') {
