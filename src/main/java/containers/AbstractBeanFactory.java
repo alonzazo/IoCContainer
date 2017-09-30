@@ -80,7 +80,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
             try {
                 newInstance = bean.getBeanClass().newInstance();
             } catch (InstantiationException e) {
-                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                throw new BeanConfigurationException("No nullary constructor found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
             } catch (IllegalAccessException e) {
                 throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
             }
