@@ -1,12 +1,6 @@
 package tests;
 
 import Annotations.*;
-import com.sun.org.glassfish.external.probe.provider.annotations.Probe;
-import containers.Bean;
-
-import javax.annotation.Resource;
-import javax.xml.ws.Action;
-import java.lang.annotation.Target;
 
 
 @Component
@@ -16,6 +10,8 @@ public class Hey {
     Hi injectThisPls;
 
     String testSingleton = "at first it says this";
+
+    public Hey(){}
 
     public Hey(Hi plsInject) {
         injectThisPls = plsInject;
@@ -31,8 +27,8 @@ public class Hey {
         System.out.println("SIRVE PRE DESCTRUCT");
     }
 
-    public void setHi(Hi hi) {
-        injectThisPls = hi;
+    public void setInjectThisPls(Hi hi) {
+        this.injectThisPls = hi;
     }
 
     public void funciono() {

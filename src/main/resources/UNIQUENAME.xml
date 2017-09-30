@@ -1,7 +1,7 @@
 <beans>
 
     <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destruct="end" scope="singleton">
-        <constructor-arg name="injectThisPls" ref="hiBean"/>
+        <property name="injectThisPls" ref="hiBean"/>
     </bean>
 	
 	<bean id="hiBean" class="tests.Hi" scope="prototype">

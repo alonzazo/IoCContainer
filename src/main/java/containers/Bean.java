@@ -15,7 +15,7 @@ public class Bean {
     private Class beanClass;
     private Method postConstruct;
     private Method preDestruct;
-    private HashMap<Class,Method> setters;
+    private HashMap<String,Method> setters;
     private boolean byName;
 
     public Constructor getConstructor() {
@@ -72,12 +72,12 @@ public class Bean {
         setters = new HashMap<>();
     }
 
-    public void addSetter(Class c,Method m){
-        setters.put(c,m);
+    public void addSetter(String s,Method m){
+        setters.put(s,m);
     }
 
-    public Method getSetter(Class c){
-        return setters.get(c);
+    public Method getSetter(String s){
+        return setters.get(s);
     }
 
     public void setName(String n) {

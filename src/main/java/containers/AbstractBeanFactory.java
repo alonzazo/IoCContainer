@@ -53,59 +53,45 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         // if prototype or singleton has not been initialized
         // prepare dependencies
         LinkedList<Object> dependencies = new LinkedList<>();
-        LinkedList<Class> dependencyTypes = new LinkedList<>();
         for(Property prop : bean.getProperties()) {
             // get instance of dependency
             if(prop.getRef() != null) {
                 // recursive
                 dependencies.add(getBean(prop.getRef()));
-                dependencyTypes.add(beans.get(prop.getRef()).getBeanClass());
             } else {
                 dependencies.add(prop.getInstance());
-                dependencyTypes.add(prop.getType());
             }
         }
 
-        // instantiate new bean
+        // instantiate new bean, with methods set by getInjectors
         if(bean.getInjectionType() == 'c') {
             // constructor injection
-            Constructor cons = null;
             try {
-                size = new Class[dependencyTypes.size()];
-                cons = bean.getBeanClass().getDeclaredConstructor((Class[]) dependencyTypes.toArray(size));
-            } catch (NoSuchMethodException e) {
+                newInstance = bean.getConstructor().newInstance(dependencies.toArray());
+            } catch (InstantiationException e) {
+                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+            } catch (IllegalAccessException e) {
+                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+            } catch (InvocationTargetException e) {
+                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+            }
+        } else {
+            // setter injection
+            try {
+                newInstance = bean.getBeanClass().newInstance();
+            } catch (InstantiationException e) {
+                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+            } catch (IllegalAccessException e) {
                 throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
             }
 
-            try {
-                newInstance = cons.newInstance(dependencies.toArray());
-            } catch (InstantiationException e) { //TODO ERROR MESAGES
-                throw new BeanConfigurationException("", e);
-            } catch (IllegalAccessException e) {
-                throw new BeanConfigurationException("", e);
-            } catch (InvocationTargetException e) {
-                throw new BeanConfigurationException("", e);
-            }
-
-        } else {
-            // TODO setter injection
-            try {
-                newInstance = bean.getBeanClass().newInstance();
-            } catch (InstantiationException e) { //TODO ERROR MESSAGE
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-            for(int i = 0; i < dependencyTypes.size(); i++) {
-
-                Method injector = bean.getInjector(dependencyTypes.get(i));
+            for(int i = 0; i < dependencies.size(); i++) {
                 try {
-                    injector.invoke(newInstance, dependencies.get(i));
+                    bean.getSetter(bean.getProperties().get(i).getName()).invoke(newInstance,dependencies.get(i));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
                 }
             }
         }

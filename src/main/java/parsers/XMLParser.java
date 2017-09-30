@@ -138,6 +138,15 @@ public class XMLParser extends AbstractParser {
                     throw new BeanConfigurationException("No name specified for a property of bean \"" + id + "\" in XML configuration.");
                 }
 
+                // get class of property
+                try {
+                    propertyField = beanClass.getDeclaredField(propertyName);
+                } catch (NoSuchFieldException e) {
+                    throw new BeanConfigurationException("Property \""+propertyName+"\" undeclared in bean \""+id+"\" of class \""+beanClass.getName()+"\".",e);
+                }
+                prop.setType(propertyField.getType());
+
+
                 // get ref/value
                 propertyRef = currentProperty.getAttributeValue("ref");
                 propertyVal = currentProperty.getAttributeValue("value");
@@ -157,13 +166,13 @@ public class XMLParser extends AbstractParser {
                     prop.setValue(propertyVal);
                     prop.setRef(null);
 
-                    // get class of property
+                    /*// get class of property
                     try {
                         propertyField = beanClass.getDeclaredField(propertyName);
                     } catch (NoSuchFieldException e) {
                         throw new BeanConfigurationException("Property \""+propertyName+"\" undeclared in bean \""+id+"\" of class \""+beanClass.getName()+"\".",e);
                     }
-                    prop.setType(propertyField.getType());
+                    prop.setType(propertyField.getType());*/
 
                     // instantiate from value given in string to the type of the field
                     // could be any java primitive + string
@@ -256,17 +265,17 @@ public class XMLParser extends AbstractParser {
 
             bean = new Bean(id, injectionType, isSingleton, beanClass, postCons, preDes, props);
 
-            if(injectionType == 's') {
+            /*if(injectionType == 's') {
                 for (Property p : props) {
                     for (Method method : beanClass.getMethods()) {
                         if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
-                            bean.addSetter(p.getType(),method);
+                            bean.addSetter(p.getName(),method);
                         }
                     }
                 }
             } else {
                 // TODO AGARRAR EL CONSTRUCTOR
-            }
+            }*/
 
 
             bf.addBean(id, bean);

@@ -12,6 +12,7 @@ public class BeanFactoryFromXML extends AbstractBeanFactory {
     public void scan(String s) throws BeanConfigurationException {
         parser = new XMLParser(s);
         parser.getBeans(this);
+        parser.getInjectors(this.beans);
     }
 
 }
