@@ -36,11 +36,11 @@ public class Hi {
         str = st;
     }
 
-    @Autowired
+    @Autowired("nada")
     public void setBy(byte by) {
         this.by = by;
     }
-
+    @Autowired("setSh")
     public void setSh(short sh) {
         this.sh = sh;
     }

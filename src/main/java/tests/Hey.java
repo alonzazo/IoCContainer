@@ -3,7 +3,7 @@ package tests;
 import Annotations.*;
 
 
-@Component
+@Component("hey")
 @Scope("Prototype")
 //@Resource
 public class Hey {
@@ -13,6 +13,7 @@ public class Hey {
 
     public Hey(){}
 
+    @Autowired
     public Hey(Hi plsInject) {
         injectThisPls = plsInject;
     }

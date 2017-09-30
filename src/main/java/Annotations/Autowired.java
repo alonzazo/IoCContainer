@@ -9,12 +9,10 @@ import java.lang.annotation.Target;
  * Created by Mariana on 20/09/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 public @interface Autowired {
-    boolean required = false;
-    String value() default "byType";
-    //String name();
-    Autowire autowiring = Autowire.byType;
+    String value() default "";
+    //Autowire autowiring = Autowire.byName;
 
 }
 enum Autowire {

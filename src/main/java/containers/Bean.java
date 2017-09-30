@@ -17,6 +17,7 @@ public class Bean {
     private Method preDestruct;
     private HashMap<String,Method> setters;
     private boolean byName;
+    private Constructor constructor;
 
     public Constructor getConstructor() {
         return constructor;
@@ -26,7 +27,6 @@ public class Bean {
         this.constructor = constructor;
     }
 
-    private Constructor constructor;
 
     public boolean isByName() {
         return byName;
@@ -70,6 +70,14 @@ public class Bean {
         byName = by;
         properties = new LinkedList(props);
         setters = new HashMap<>();
+    }
+
+    public HashMap<String, Method> getSetters() {
+        return setters;
+    }
+
+    public void setSetters(HashMap<String, Method> setters) {
+        this.setters = setters;
     }
 
     public void addSetter(String s,Method m){
@@ -140,6 +148,10 @@ public class Bean {
         return properties;
     }
 
+    public void setProperties(LinkedList<Property> properties) {
+        this.properties = properties;
+    }
+
     public String toString() {
         String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
         if(singleton) {
@@ -159,7 +171,7 @@ public class Bean {
         } else if(injectionType=='s') {
             str+="setter";
         }
-        str += "\npostConstructor: "+postConstruct+"\npreDestruct: "+preDestruct;
+        str += "\npostConstructor: "+postConstruct+"\npreDestruct: "+preDestruct + "\n";
 
         if(!properties.isEmpty()) {
             str+="\nProperties:\n";
