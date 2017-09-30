@@ -31,37 +31,34 @@ public abstract class AbstractParser implements Parser{
                     size = new Class[dependencyTypes.size()];
                     cons = bean.getBeanClass().getDeclaredConstructor((Class[]) dependencyTypes.toArray(size));
                 } catch (NoSuchMethodException e) {
-                    throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                    throw new BeanConfigurationException("No suitable constructor for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
                 }
                 bean.setConstructor(cons);
             }
-            else if(!bean.isByName()) //injection byType setter
+            else if(!bean.isByName()) //injection byType setter  TODO no se pueden tipos iguales
             {
                 for (Property p : bean.getProperties()) {
                     for (Method method : bean.getBeanClass().getMethods()) {
                         if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
                             bean.addSetter(p.getName(),method);
+                            break;
                         }
+                    }
+                    if(bean.getSetter(p.getName()) == null) {
+                        throw new BeanConfigurationException("No suitable setter method found for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".");
                     }
                 }
             }
-            else //injection byName setter TODO no se pueden tipos iguales
+            else //injection byName setter
             {
                 Method setter = null;
                 for (Property p : bean.getProperties()) {
-
-                    if(p.getRef()!=null) {
-                        firstL = p.getRef().substring(0,1).toUpperCase();
-                        setterName = "set" + firstL + p.getRef().substring(1);
-                    } else {
-                        firstL = p.getName().substring(0,1).toUpperCase();
-                        setterName = "set" + firstL + p.getName().substring(1);
-                    }
-
+                    firstL = p.getName().substring(0,1).toUpperCase();
+                    setterName = "set" + firstL + p.getName().substring(1);
                     try {
                         setter = bean.getBeanClass().getDeclaredMethod(setterName,p.getType());
                     } catch (NoSuchMethodException e) {
-                        throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                        throw new BeanConfigurationException("No suitable setter method(s) found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
                     }
                     bean.addSetter(p.getName(),setter);
                 }
