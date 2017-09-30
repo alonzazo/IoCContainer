@@ -15,7 +15,7 @@ public abstract class AbstractParser implements Parser{
     public void getInjectors(HashMap<String,Bean> beans) throws BeanConfigurationException {
         Class[] size;
         Constructor cons = null;
-        String setterName;
+        String setterName, firstL;
         for(Bean bean : beans.values()){
             if(bean.getInjectionType() == 'c') // si es constructor TODO no se pueden tipos iguales
             {
@@ -49,11 +49,12 @@ public abstract class AbstractParser implements Parser{
             {
                 Method setter = null;
                 for (Property p : bean.getProperties()) {
-                    //bean.addSetter(p.getType(),method);
-                    String firstL = p.getName().substring(0,1).toUpperCase();
+
                     if(p.getRef()!=null) {
+                        firstL = p.getRef().substring(0,1).toUpperCase();
                         setterName = "set" + firstL + p.getRef().substring(1);
                     } else {
+                        firstL = p.getName().substring(0,1).toUpperCase();
                         setterName = "set" + firstL + p.getName().substring(1);
                     }
 
