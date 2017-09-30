@@ -1,10 +1,10 @@
 <beans>
 
-    <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destruct="end" scope="singleton">
+    <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destruct="end" scope="singleton" autowiring="byType">
         <property name="injectThisPls" ref="hiBean"/>
     </bean>
 	
-	<bean id="hiBean" class="tests.Hi" scope="prototype">
+	<bean id="hiBean" class="tests.Hi" scope="prototype" autowiring="byType">
 		<property name="by" value="33"/>
 		<property name="sh" value="92"/>
 		<property name="in" value="3"/>

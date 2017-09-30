@@ -27,7 +27,7 @@ public class Hey {
         System.out.println("SIRVE PRE DESCTRUCT");
     }
 
-    public void setInjectThisPls(Hi hi) {
+    public void setHiBean(Hi hi) {
         this.injectThisPls = hi;
     }
 

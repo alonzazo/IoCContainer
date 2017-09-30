@@ -30,14 +30,14 @@ public class Main {
         } catch (BeanConfigurationException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println(annoBF.printBeans()+"\n\n");
+        System.out.println(annoBF.printBeans()+"\n\n");*/
 
-        System.out.println("XML:");*/
+        System.out.println("XML:");
         BeanFactory xmlBF = new BeanFactoryFromXML();
 
         // EL XML ESTA EN RESOURCES, CAMBIEN EL PATH PARA PODER TESTEAR
         xmlBF.scan("src\\main\\resources\\UNIQUENAME.xml");
-        //System.out.println(xmlBF.printBeans());
+        System.out.println(xmlBF.printBeans());
 
         Hey hey = (Hey) xmlBF.getBean("heyBean");
 
@@ -50,7 +50,7 @@ public class Main {
 
         System.out.println("SE VA A CERRAR EL CONTAINER");
 
-        /*xmlBF.close();
+        xmlBF.close();
 
         System.out.println("SE CERRó EL CONTAINER");
 
@@ -58,6 +58,6 @@ public class Main {
             hey = (Hey) xmlBF.getBean("heyBean");
         } catch(BeanConfigurationException e) {
             System.out.println("FUNCIONA CLOSE");
-        }*/
+        }
     }
 }
