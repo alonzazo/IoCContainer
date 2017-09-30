@@ -72,6 +72,19 @@ public class Bean {
         setters = new HashMap<>();
     }
 
+    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,LinkedList<Property> props, Constructor c) {
+        name = n;
+        singleton = single;
+        injectionType = injection;
+        beanClass = bClass;
+        postConstruct = post;
+        preDestruct = pre;
+        byName = by;
+        properties = new LinkedList(props);
+        setters = new HashMap<>();
+        constructor = c;
+    }
+
     public HashMap<String, Method> getSetters() {
         return setters;
     }

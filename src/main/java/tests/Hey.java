@@ -3,9 +3,8 @@ package tests;
 import Annotations.*;
 
 
-@Component("hey")
+@Component("heyBean")
 @Scope("Prototype")
-//@Resource
 public class Hey {
     Hi injectThisPls;
 

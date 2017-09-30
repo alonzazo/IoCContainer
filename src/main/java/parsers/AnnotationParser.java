@@ -53,8 +53,12 @@ public class AnnotationParser extends AbstractParser {
         Constructor beanCons = null;
         HashMap<String,Method> setters = new HashMap<>();
         for (Class c : classes) {
+            id = null;
+            postCons = null;
+            preDes = null;
             injectionType = ' ';
             properties.clear();
+            setters.clear();
             annos = c.getAnnotations();
             if (annos.length != 0 && annos[0].annotationType().getSimpleName().equals("Component")) {
                 params = annos[0].toString().split("=");
@@ -144,7 +148,9 @@ public class AnnotationParser extends AbstractParser {
                         }
                     }
                 }
-                bean = new Bean(id, injectionType, isSingleton, byName, c, postCons, preDes, properties);
+                System.out.print("hello");
+                bean = new Bean(id, injectionType, isSingleton, byName, c, postCons, preDes, properties, beanCons);
+                System.out.print("world");
                 bf.addBean(id, bean);
                 bean.setSetters(setters);
             }

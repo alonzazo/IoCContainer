@@ -4,7 +4,7 @@
         <property name="injectThisPls" ref="hiBean"/>
     </bean>
 	
-	<bean id="hiBean" class="tests.Hi" scope="prototype" autowiring="byType">
+	<bean id="hiBean" class="tests.Hi" scope="prototype" autowiring="byName">
 		<property name="by" value="33"/>
 		<property name="sh" value="92"/>
 		<property name="in" value="3"/>
