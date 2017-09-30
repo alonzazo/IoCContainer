@@ -46,8 +46,8 @@ public class XMLParser extends AbstractParser {
         Element currentBean, currentProperty;
         Bean bean;
         // Configuration variables for each bean
-        String id, classString, scope, postConsS, preDesS, propertyRef, propertyVal, propertyName, propertyType;
-        Boolean isSingleton;
+        String id, classString, scope, autowiring, postConsS, preDesS, propertyRef, propertyVal, propertyName, propertyType;
+        Boolean isSingleton, isByName;
         char injectionType = '$';
         Class beanClass;
         Property prop;
@@ -93,6 +93,17 @@ public class XMLParser extends AbstractParser {
                 throw new BeanConfigurationException("Unrecognized scope \""+scope+"\" for bean \""+id+"\" in XML configuration.");
             }
 
+            // get autowiring type, defaults to byName
+            // throws exception if different from byName or byType
+            autowiring = currentBean.getAttributeValue("autowiring");
+            if(autowiring == null || autowiring.equals("byName")) {
+                isByName = true;
+            } else if (autowiring.equals("byType")) {
+                isByName = false;
+            } else {
+                throw new BeanConfigurationException("Unrecognized autowiring mode \""+autowiring+"\" for bean \""+id+"\" in XML configuration.");
+            }
+
             // get constructor and destructor methods, fields are not required so no exception handling necessary
             if((postConsS = currentBean.getAttributeValue("post-construct")) != null) {
                 try{
@@ -126,6 +137,10 @@ public class XMLParser extends AbstractParser {
                     injectionType = 's';
                 }  else if(currentProperty.getLocalName().equals("constructor-arg")) {
                     // injecting with constructor
+                    // exception: can't autowire byName with a constructor
+                    if(isByName) {
+                        throw new BeanConfigurationException("Cannot autowire by name with a constructor in bean \""+id+"\" in XML configuration.");
+                    }
                     injectionType = 'c';
                 }
 
@@ -165,14 +180,6 @@ public class XMLParser extends AbstractParser {
                 } else {
                     prop.setValue(propertyVal);
                     prop.setRef(null);
-
-                    /*// get class of property
-                    try {
-                        propertyField = beanClass.getDeclaredField(propertyName);
-                    } catch (NoSuchFieldException e) {
-                        throw new BeanConfigurationException("Property \""+propertyName+"\" undeclared in bean \""+id+"\" of class \""+beanClass.getName()+"\".",e);
-                    }
-                    prop.setType(propertyField.getType());*/
 
                     // instantiate from value given in string to the type of the field
                     // could be any java primitive + string
@@ -263,20 +270,7 @@ public class XMLParser extends AbstractParser {
                 props.add(prop);
             }
 
-            bean = new Bean(id, injectionType, isSingleton, beanClass, postCons, preDes, props);
-
-            /*if(injectionType == 's') {
-                for (Property p : props) {
-                    for (Method method : beanClass.getMethods()) {
-                        if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
-                            bean.addSetter(p.getName(),method);
-                        }
-                    }
-                }
-            } else {
-                // TODO AGARRAR EL CONSTRUCTOR
-            }*/
-
+            bean = new Bean(id, injectionType, isSingleton, isByName, beanClass, postCons, preDes, props);
 
             bf.addBean(id, bean);
         }
