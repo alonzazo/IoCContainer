@@ -132,8 +132,4 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         beans.clear();
     }
 
-    private void setDependencies() {
-
-    }
-
 }

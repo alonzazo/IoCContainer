@@ -129,12 +129,15 @@ public class AnnotationParser extends AbstractParser {
                 }
                 if(injectionType == ' ') //injection by constructor, byType
                 {
+                    System.out.println("by constructor");
                     for(Constructor con : c.getConstructors())
                     {
+                        System.out.println("constructor "+con.toString());
                         Annotation[] consAn = con.getDeclaredAnnotations();
                         if(consAn.length != 0 && consAn[0].annotationType().getSimpleName().equals("Autowired"))
                         {
                             injectionType = 'c';
+                            System.out.println("set injectionType to "+injectionType);
                             byName = false;
                             beanCons = con;
                             for(Class conType : con.getParameterTypes())
@@ -148,9 +151,17 @@ public class AnnotationParser extends AbstractParser {
                         }
                     }
                 }
-                System.out.print("hello");
+                /*System.out.println("id: "+id);
+                System.out.println("injectType: "+injectionType);
+                System.out.println("singleton "+isSingleton);
+                System.out.println("byName "+byName);
+                System.out.println("class: "+c.getSimpleName());
+                System.out.println("postCons: "+postCons.getName());
+                //System.out.println(preDes.getName());
+                //System.out.println(properties.getFirst().getName());
+                //System.out.println(beanCons.getName());*/
+
                 bean = new Bean(id, injectionType, isSingleton, byName, c, postCons, preDes, properties, beanCons);
-                System.out.print("world");
                 bf.addBean(id, bean);
                 bean.setSetters(setters);
             }

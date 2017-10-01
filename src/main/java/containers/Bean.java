@@ -165,7 +165,7 @@ public class Bean {
         this.properties = properties;
     }
 
-    public String toString() {
+    /*public String toString() {
         String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
         if(singleton) {
             str+="singleton";
@@ -193,5 +193,5 @@ public class Bean {
             }
         }
         return str;
-    }
+    }*/
 }

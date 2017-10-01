@@ -12,9 +12,13 @@ public class Hey {
 
     public Hey(){}
 
-    @Autowired
     public Hey(Hi plsInject) {
         injectThisPls = plsInject;
+    }
+
+    @Autowired("heyBean")
+    public void setIdsfgdsfg(Hi hi) {
+        this.injectThisPls = hi;
     }
 
     @PostInicialization
@@ -27,9 +31,7 @@ public class Hey {
         System.out.println("SIRVE PRE DESCTRUCT");
     }
 
-    public void setInjectThisPls(Hi hi) {
-        this.injectThisPls = hi;
-    }
+
 
     public void funciono() {
         injectThisPls.funciono();
