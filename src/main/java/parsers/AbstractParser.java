@@ -15,10 +15,12 @@ public abstract class AbstractParser implements Parser{
         Class[] size;
         Constructor cons = null;
         String setterName, firstL;
+        int setterCount;
+        LinkedList<Class> dependencyTypes;
         for(Bean bean : beans.values()){
             if(bean.getInjectionType() == 'c') // si es constructor TODO no se pueden tipos iguales
             {
-                LinkedList<Class> dependencyTypes = new LinkedList<>();
+                dependencyTypes = new LinkedList<>();
                 for(Property prop : bean.getProperties()) {
                     if (prop.getRef() != null) {
                         dependencyTypes.add(beans.get(prop.getRef()).getBeanClass());
@@ -37,15 +39,18 @@ public abstract class AbstractParser implements Parser{
             else if(!bean.isByName()) //injection byType setter  TODO no se pueden tipos iguales
             {
                 for (Property p : bean.getProperties()) {
+                    setterCount = 0;
                     for (Method method : bean.getBeanClass().getMethods()) {
                         if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
                             bean.addSetter(method);
-                            break;
+                            setterCount++;
                         }
                     }
-                    /*if(bean.getSetter(p.getName()) == null) { TODO FIX THIS SHIT
+                    if(setterCount < 1){
                         throw new BeanConfigurationException("No suitable setter method found for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".");
-                    }*/
+                    } else if (setterCount > 1) {
+                        throw new BeanConfigurationException("More than one suitable setter method found for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".");
+                    }
                 }
             }
             else //injection byName setter
