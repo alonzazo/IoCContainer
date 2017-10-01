@@ -3,7 +3,7 @@ package tests;
 import Annotations.Autowired;
 import Annotations.Component;
 
-@Component("hiBean")
+@Component
 public class Hi {
 
     byte by;
@@ -18,7 +18,9 @@ public class Hi {
     char ch;
     String str;
 
-    @Autowired
+    Hey hey;
+
+    //@Autowired
     public Hi() {
 
     }
@@ -36,6 +38,10 @@ public class Hi {
         str = st;
     }
 
+    @Autowired("heyBean")
+    public void setHey(Hey hey) {
+        this.hey = hey;
+    }
     /*@Autowired
     public void setBy(byte by) {
         this.by = by;

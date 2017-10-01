@@ -6,6 +6,7 @@ import parsers.Parser;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Stack;
 
 public abstract class AbstractBeanFactory implements BeanFactory {
 
@@ -14,6 +15,34 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
     public AbstractBeanFactory() {
         beans = new HashMap<>();
+    }
+
+    public boolean dependencyCycle(){
+        String[] beanNames = beans.keySet().toArray(new String[0]);
+        Stack<String> stack = new Stack<>();
+        stack.push(beanNames[0]);
+        return recursiveDependencyCycle(stack);
+
+    }
+
+    public boolean recursiveDependencyCycle(Stack<String> stack){
+        Bean bean = beans.get(stack.peek());
+        if(bean != null ) {
+            for (Property property : bean.getProperties()) {
+                if (property.getRef() != null) {
+                    if (stack.search(property.getRef()) > 0) {
+                        return true;
+                    } else {
+                        stack.push(property.getRef());
+                        if (recursiveDependencyCycle(stack)) {
+                            return true;
+                        }
+                        stack.pop();
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void addBean(String key, Bean bean) throws BeanConfigurationException{

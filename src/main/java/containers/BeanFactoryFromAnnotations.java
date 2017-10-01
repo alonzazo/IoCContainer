@@ -13,6 +13,10 @@ public class BeanFactoryFromAnnotations extends AbstractBeanFactory {
     public void scan(String pack) throws BeanConfigurationException {
         parser = new AnnotationParser(pack);
         parser.getBeans(this);
+        if(dependencyCycle())
+        {
+            throw new BeanConfigurationException("CICLO");
+        }
     }
 
 }

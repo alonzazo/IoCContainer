@@ -147,16 +147,6 @@ public class AnnotationParser extends AbstractParser {
                         }
                     }
                 }
-                /*System.out.println("id: "+id);
-                System.out.println("injectType: "+injectionType);
-                System.out.println("singleton "+isSingleton);
-                System.out.println("byName "+byName);
-                System.out.println("class: "+c.getSimpleName());
-                System.out.println("postCons: "+postCons.getName());
-                //System.out.println(preDes.getName());
-                //System.out.println(properties.getFirst().getName());
-                //System.out.println(beanCons.getName());*/
-
                 bean = new Bean(id, injectionType, isSingleton, byName, c, postCons, preDes, properties, beanCons);
                 bf.addBean(id, bean);
                 bean.setSetters(setters);

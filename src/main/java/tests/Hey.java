@@ -16,7 +16,7 @@ public class Hey {
         injectThisPls = plsInject;
     }
 
-    @Autowired("heyBean")
+    @Autowired
     public void setIdsfgdsfg(Hi hi) {
         this.injectThisPls = hi;
     }

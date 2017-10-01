@@ -32,13 +32,13 @@ public class Main {
         }
         //System.out.println(annoBF.printBeans()+"\n\n");
 
-        Hey hey = null;
+        /*Hey hey = null;
         try {
             hey = (Hey) annoBF.getBean("heyBean");
         } catch(BeanConfigurationException e) {
             System.out.println(e.getMessage());
         }
-        hey.injectThisPls.funciono();
+        hey.injectThisPls.funciono();*/
 
         /*System.out.println("XML:");
         BeanFactory xmlBF = new BeanFactoryFromXML();
