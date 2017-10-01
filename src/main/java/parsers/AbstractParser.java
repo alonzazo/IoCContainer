@@ -3,7 +3,6 @@ package parsers;
 import containers.AbstractBeanFactory;
 import containers.Bean;
 import containers.Property;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -40,13 +39,13 @@ public abstract class AbstractParser implements Parser{
                 for (Property p : bean.getProperties()) {
                     for (Method method : bean.getBeanClass().getMethods()) {
                         if (method.getParameterCount() == 1 && method.getParameterTypes()[0].equals(p.getType()) && method.getName().contains("set")) {
-                            bean.addSetter(p.getName(),method);
+                            bean.addSetter(method);
                             break;
                         }
                     }
-                    if(bean.getSetter(p.getName()) == null) {
+                    /*if(bean.getSetter(p.getName()) == null) { TODO FIX THIS SHIT
                         throw new BeanConfigurationException("No suitable setter method found for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".");
-                    }
+                    }*/
                 }
             }
             else //injection byName setter
@@ -60,7 +59,7 @@ public abstract class AbstractParser implements Parser{
                     } catch (NoSuchMethodException e) {
                         throw new BeanConfigurationException("No suitable setter method(s) found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
                     }
-                    bean.addSetter(p.getName(),setter);
+                    bean.addSetter(setter);
                 }
             }
             beans.put(bean.getName(),bean);

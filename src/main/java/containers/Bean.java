@@ -1,23 +1,48 @@
 package containers;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.lang.reflect.Method;
 
 public class Bean {
 
-    private LinkedList<Property> properties ;
-    private Object singletonInstance;
-    private String name;
+    private boolean byName;
     private boolean singleton;
     private char injectionType;
+    private String name;
+    private Object singletonInstance;
     private Class beanClass;
+    private Constructor constructor;
     private Method postConstruct;
     private Method preDestruct;
-    private HashMap<String,Method> setters;
-    private boolean byName;
-    private Constructor constructor;
+    private ArrayList<Property> properties ;
+    private ArrayList<Method> setters;
+
+    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,ArrayList<Property> props) {
+        name = n;
+        singleton = single;
+        injectionType = injection;
+        beanClass = bClass;
+        postConstruct = post;
+        preDestruct = pre;
+        byName = by;
+        properties = new ArrayList<>(props);
+        setters = new ArrayList<>();
+    }
+
+    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,ArrayList<Property> props, Constructor c) {
+        name = n;
+        singleton = single;
+        injectionType = injection;
+        beanClass = bClass;
+        postConstruct = post;
+        preDestruct = pre;
+        byName = by;
+        properties = new ArrayList(props);
+        setters = new ArrayList<>();
+        constructor = c;
+    }
+
 
     public Constructor getConstructor() {
         return constructor;
@@ -38,67 +63,21 @@ public class Bean {
 
     public Bean() {}
 
-    public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre, LinkedList<Property> props) {
-        name = n;
-        singleton = single;
-        injectionType = injection;
-        beanClass = bClass;
-        postConstruct = post;
-        preDestruct = pre;
-        properties = new LinkedList(props);
-        setters = new HashMap<>();
-    }
 
-    public Bean(String n, char injection, Boolean single, Class bClass, Method post, Method pre) {
-        name = n;
-        singleton = single;
-        injectionType = injection;
-        beanClass = bClass;
-        postConstruct = post;
-        preDestruct = pre;
-        properties = new LinkedList();
-        setters = new HashMap<>();
-    }
-
-    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,LinkedList<Property> props) {
-        name = n;
-        singleton = single;
-        injectionType = injection;
-        beanClass = bClass;
-        postConstruct = post;
-        preDestruct = pre;
-        byName = by;
-        properties = new LinkedList(props);
-        setters = new HashMap<>();
-    }
-
-    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,LinkedList<Property> props, Constructor c) {
-        name = n;
-        singleton = single;
-        injectionType = injection;
-        beanClass = bClass;
-        postConstruct = post;
-        preDestruct = pre;
-        byName = by;
-        properties = new LinkedList(props);
-        setters = new HashMap<>();
-        constructor = c;
-    }
-
-    public HashMap<String, Method> getSetters() {
+    public ArrayList<Method> getSetters() {
         return setters;
     }
 
-    public void setSetters(HashMap<String, Method> setters) {
+    public void setSetters(ArrayList<Method> setters) {
         this.setters = setters;
     }
 
-    public void addSetter(String s,Method m){
-        setters.put(s,m);
+    public void addSetter(Method m){
+        setters.add(m);
     }
 
-    public Method getSetter(String s){
-        return setters.get(s);
+    public Method getSetter(int i ){
+        return setters.get(i);
     }
 
     public void setName(String n) {
@@ -157,15 +136,15 @@ public class Bean {
         return injectionType;
     }
 
-    public LinkedList<Property> getProperties() {
+    public ArrayList<Property> getProperties() {
         return properties;
     }
 
-    public void setProperties(LinkedList<Property> properties) {
+    public void setProperties(ArrayList<Property> properties) {
         this.properties = properties;
     }
 
-    /*public String toString() {
+    public String toString() {
         String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
         if(singleton) {
             str+="singleton";
@@ -193,5 +172,5 @@ public class Bean {
             }
         }
         return str;
-    }*/
+    }
 }

@@ -9,11 +9,10 @@ import nu.xom.ParsingException;
 import nu.xom.ValidityException;
 import nu.xom.Element;
 import nu.xom.Elements;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class XMLParser extends AbstractParser {
     private Document XMLDoc;
@@ -53,7 +52,7 @@ public class XMLParser extends AbstractParser {
         Property prop;
         Field propertyField;
         Method postCons = null, preDes = null;
-        LinkedList<Property> props = new LinkedList<Property>();
+        ArrayList<Property> props = new ArrayList<Property>();
         Class[] parameterTypes;
 
         for(int i = 0; i < beanElements.size(); i++) {

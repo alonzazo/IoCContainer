@@ -3,9 +3,7 @@ package containers;
 import parsers.BeanConfigurationException;
 import parsers.Parser;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -63,7 +61,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
             }
         }
 
-        // instantiate new bean, with methods set by getInjectors
+        // instantiate new bean via invoking constructor/setter(s)
         if(bean.getInjectionType() == 'c') {
             // constructor injection
             try {
@@ -87,7 +85,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
             for(int i = 0; i < dependencies.size(); i++) {
                 try {
-                    bean.getSetter(bean.getProperties().get(i).getName()).invoke(newInstance,dependencies.get(i));
+                    bean.getSetter(i).invoke(newInstance,dependencies.get(i));
                 } catch (IllegalAccessException e) {
                     throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
                 } catch (InvocationTargetException e) {

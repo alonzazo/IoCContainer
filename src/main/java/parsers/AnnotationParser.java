@@ -2,28 +2,24 @@ package parsers;
 
 import containers.AbstractBeanFactory;
 import containers.Bean;
-import containers.BeanFactory;
 import containers.Property;
-import org.apache.xpath.operations.Bool;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-
-import javax.naming.LinkLoopException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 public class AnnotationParser extends AbstractParser {
     private Set<Class<?>> classes;
-    private LinkedList<Property> properties;
+    private ArrayList<Property> properties;
 
     public AnnotationParser(String pack) {
         // stackoverflow
@@ -38,7 +34,7 @@ public class AnnotationParser extends AbstractParser {
                 .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(pack))));
 
         classes = reflections.getSubTypesOf(Object.class);
-        properties = new LinkedList<>();
+        properties = new ArrayList<>();
     }
 
     public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException {
@@ -51,7 +47,7 @@ public class AnnotationParser extends AbstractParser {
         Annotation[] annos;
         String params[];
         Constructor beanCons = null;
-        HashMap<String,Method> setters = new HashMap<>();
+        ArrayList<Method> setters = new ArrayList<>();
         for (Class c : classes) {
             id = null;
             postCons = null;
@@ -105,7 +101,7 @@ public class AnnotationParser extends AbstractParser {
                                         property.setName(params[1].substring(0,params[1].length()-1));
                                         property.setType(types[0]);
                                         properties.add(property);
-                                        setters.put(property.getName(),method);
+                                        setters.add(method);
                                     } else {  //byType
                                         byName = false;
                                         Class[] types = method.getParameterTypes();
@@ -114,7 +110,7 @@ public class AnnotationParser extends AbstractParser {
                                         property.setName(types[0].getSimpleName());
                                         property.setType(types[0]);
                                         properties.add(property);
-                                        setters.put(property.getName(),method);
+                                        setters.add(method);
                                     }
                                 }
                                     break;
