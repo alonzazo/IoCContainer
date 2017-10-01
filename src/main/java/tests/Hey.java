@@ -4,20 +4,27 @@ import Annotations.*;
 
 
 @Component("heyBean")
-@Scope("Prototype")
+@Scope("Singleton")
 public class Hey {
     Hi injectThisPls;
 
     String testSingleton = "at first it says this";
 
+    //@Autowired
     public Hey(){}
 
+    @Autowired
     public Hey(Hi plsInject) {
         injectThisPls = plsInject;
     }
 
-    @Autowired
-    public void setIdsfgdsfg(Hi hi) {
+    //@Autowired("Hi")
+    public void setIdsfgdsfg(Hi hi, String extra) {
+        this.injectThisPls = hi;
+    }
+
+    //@Autowired("Hi")
+    public void setIdasdfgdsfg(Hi hi, String extra) {
         this.injectThisPls = hi;
     }
 

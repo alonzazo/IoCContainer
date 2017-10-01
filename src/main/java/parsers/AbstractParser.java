@@ -3,6 +3,8 @@ package parsers;
 import containers.AbstractBeanFactory;
 import containers.Bean;
 import containers.Property;
+import exceptions.BeanConfigurationException;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.LinkedList;
 
 public abstract class AbstractParser implements Parser{
 
-    public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException{}
+    public void getBeans(AbstractBeanFactory bf) throws BeanConfigurationException {}
     public void getInjectors(HashMap<String,Bean> beans) throws BeanConfigurationException {
         Class[] size;
         Constructor cons = null;
@@ -18,7 +20,7 @@ public abstract class AbstractParser implements Parser{
         int setterCount;
         LinkedList<Class> dependencyTypes;
         for(Bean bean : beans.values()){
-            if(bean.getInjectionType() == 'c') // si es constructor TODO no se pueden tipos iguales
+            if(bean.getInjectionType() == 'c') // si es constructor
             {
                 dependencyTypes = new LinkedList<>();
                 for(Property prop : bean.getProperties()) {
@@ -36,7 +38,7 @@ public abstract class AbstractParser implements Parser{
                 }
                 bean.setConstructor(cons);
             }
-            else if(!bean.isByName()) //injection byType setter  TODO no se pueden tipos iguales
+            else if(!bean.isByName()) //injection byType setter
             {
                 for (Property p : bean.getProperties()) {
                     setterCount = 0;
@@ -61,8 +63,11 @@ public abstract class AbstractParser implements Parser{
                     setterName = "set" + firstL + p.getName().substring(1);
                     try {
                         setter = bean.getBeanClass().getDeclaredMethod(setterName,p.getType());
+                        if(setter.getParameterCount() != 1) {
+                            throw new BeanConfigurationException("Setter method \""+setter.getName()+"\" for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" in class \""+bean.getBeanClass().getName()+"\" must have exactly one parameter.");
+                        }
                     } catch (NoSuchMethodException e) {
-                        throw new BeanConfigurationException("No suitable setter method(s) found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
+                        throw new BeanConfigurationException("No suitable setter method found for property \""+p.getName()+"\" of bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
                     }
                     bean.addSetter(setter);
                 }

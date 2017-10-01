@@ -1,6 +1,7 @@
 package containers;
 
-import parsers.BeanConfigurationException;
+import exceptions.BeanConfigurationException;
+import exceptions.BeanInstantiationException;
 import parsers.Parser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -65,13 +66,13 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         return str;
     }
 
-    public Object getBean(String name) throws BeanConfigurationException{
+    public Object getBean(String name) throws BeanInstantiationException{
 
         Bean bean, dependency;
         Object newInstance = null;
         Class[] size;
         if((bean = beans.get(name)) == null)
-            throw new BeanConfigurationException("Undefined bean \""+name+"\".");
+            throw new BeanInstantiationException("Undefined bean \""+name+"\".");
 
         // if singleton and has been initialized
         if(bean.isSingleton() && bean.getSingletonInstance() != null)
@@ -96,29 +97,29 @@ public abstract class AbstractBeanFactory implements BeanFactory {
             try {
                 newInstance = bean.getConstructor().newInstance(dependencies.toArray());
             } catch (InstantiationException e) {
-                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                throw new BeanInstantiationException(e);
             } catch (IllegalAccessException e) {
-                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                throw new BeanInstantiationException(e);
             } catch (InvocationTargetException e) {
-                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                throw new BeanInstantiationException(e);
             }
         } else {
             // setter injection
             try {
                 newInstance = bean.getBeanClass().newInstance();
             } catch (InstantiationException e) {
-                throw new BeanConfigurationException("No nullary constructor found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
+                throw new BeanInstantiationException("No nullary constructor found for bean \""+bean.getName()+"\" of class \""+bean.getBeanClass().getName()+"\".", e);
             } catch (IllegalAccessException e) {
-                throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                throw new BeanInstantiationException(e);
             }
 
             for(int i = 0; i < dependencies.size(); i++) {
                 try {
                     bean.getSetter(i).invoke(newInstance,dependencies.get(i));
                 } catch (IllegalAccessException e) {
-                    throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                    throw new BeanInstantiationException(e);
                 } catch (InvocationTargetException e) {
-                    throw new BeanConfigurationException("", e); //TODO ERROR MESSAGE
+                    throw new BeanInstantiationException(e);
                 }
             }
         }
@@ -127,10 +128,10 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         if(bean.getPostConstruct() != null) {
             try {
                 bean.getPostConstruct().invoke(newInstance);
-            } catch (IllegalAccessException e) { //TODO ERROR MESSAGES
-                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                throw new BeanInstantiationException(e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                throw new BeanInstantiationException(e);
             }
         }
 
@@ -142,16 +143,16 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         return newInstance;
     }
 
-     public void close() {
+     public void close() throws BeanInstantiationException{
 
         for(Bean bean : beans.values()) {
             if(bean.isSingleton() && bean.getPreDestruct() != null) {
                 try {
                     bean.getPreDestruct().invoke(bean.getSingletonInstance());
-                } catch (IllegalAccessException e) { //TODO ERROR MESSAGES
-                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    throw new BeanInstantiationException(e);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    throw new BeanInstantiationException(e);
                 }
             }
         }

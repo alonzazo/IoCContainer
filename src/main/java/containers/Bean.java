@@ -30,7 +30,7 @@ public class Bean {
         setters = new ArrayList<>();
     }
 
-    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,ArrayList<Property> props, Constructor c) {
+    public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,ArrayList<Property> props, Constructor c, ArrayList<Method> setts) {
         name = n;
         singleton = single;
         injectionType = injection;
@@ -39,8 +39,8 @@ public class Bean {
         preDestruct = pre;
         byName = by;
         properties = new ArrayList(props);
-        setters = new ArrayList<>();
         constructor = c;
+        setters = new ArrayList<>(setts);
     }
 
 

@@ -1,7 +1,7 @@
 package containers;
 
 import parsers.AnnotationParser;
-import parsers.BeanConfigurationException;
+import exceptions.BeanConfigurationException;
 
 
 public class BeanFactoryFromAnnotations extends AbstractBeanFactory {
@@ -15,7 +15,7 @@ public class BeanFactoryFromAnnotations extends AbstractBeanFactory {
         parser.getBeans(this);
         if(dependencyCycle())
         {
-            throw new BeanConfigurationException("CICLO");
+            throw new BeanConfigurationException("Impossible to resolve bean dependencies, a cycle is formed.");
         }
     }
 

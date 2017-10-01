@@ -1,9 +1,9 @@
 <beans>
 
     <bean id="heyBean" class="tests.Hey"  post-construct="start" pre-destruct="end" scope="singleton" autowiring="byType">
-        <property name="injectThisPls" ref="hiBean"/>
+        <propertyF name="injectThisPls" ref="hiBean"/>
     </bean>
-	
+
 	<bean id="hiBean" class="tests.Hi" scope="prototype" autowiring="byName">
 		<property name="by" value="33"/>
 		<property name="sh" value="92"/>

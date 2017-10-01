@@ -3,6 +3,7 @@ package parsers;
 import java.io.IOException;
 
 import containers.*;
+import exceptions.BeanConfigurationException;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class XMLParser extends AbstractParser {
     private Document XMLDoc;
@@ -52,7 +54,9 @@ public class XMLParser extends AbstractParser {
         Property prop;
         Field propertyField;
         Method postCons = null, preDes = null;
-        ArrayList<Property> props = new ArrayList<Property>();
+        ArrayList<Property> props = new ArrayList<>();
+        LinkedList<Class> propertyTypes = new LinkedList<>(); // to check there are no repeated property types when autowiring by type
+        LinkedList<String> propertyNames = new LinkedList<>(); // to check there are no repeated property names when autowiring by name
         Class[] parameterTypes;
 
         for(int i = 0; i < beanElements.size(); i++) {
@@ -158,6 +162,17 @@ public class XMLParser extends AbstractParser {
                 } catch (NoSuchFieldException e) {
                     throw new BeanConfigurationException("Property \""+propertyName+"\" undeclared in bean \""+id+"\" of class \""+beanClass.getName()+"\".",e);
                 }
+
+                if(isByName) {
+                    if(propertyNames.contains(propertyName))
+                        throw new BeanConfigurationException("Bean \""+id+"\" cannot have multiple properties with the same name when autowiring by name.");
+                    propertyNames.add(propertyName);
+                } else {
+                    if(propertyTypes.contains(propertyField.getType()))
+                        throw new BeanConfigurationException("Bean \""+id+"\" cannot have multiple properties with the same type when autowiring by type.");
+                    propertyTypes.add(propertyField.getType());
+                }
+
                 prop.setType(propertyField.getType());
 
 

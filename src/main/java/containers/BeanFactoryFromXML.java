@@ -1,6 +1,6 @@
 package containers;
 
-import parsers.BeanConfigurationException;
+import exceptions.BeanConfigurationException;
 import parsers.XMLParser;
 
 public class BeanFactoryFromXML extends AbstractBeanFactory {
@@ -15,7 +15,7 @@ public class BeanFactoryFromXML extends AbstractBeanFactory {
         parser.getInjectors(this.beans);
         if(dependencyCycle())
         {
-            throw new BeanConfigurationException("CICLO");
+            throw new BeanConfigurationException("Impossible to resolve bean dependencies, a cycle is formed.");
         }
     }
 
