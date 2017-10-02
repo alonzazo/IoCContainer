@@ -12,11 +12,13 @@ public class Bean {
     private String name;
     private Object singletonInstance;
     private Class beanClass;
-    private Constructor constructor;
     private Method postConstruct;
     private Method preDestruct;
-    private ArrayList<Property> properties ;
+    private Constructor constructor;
     private ArrayList<Method> setters;
+    private ArrayList<Property> properties ;
+
+    public Bean() {}
 
     public Bean(String n, char injection, Boolean single, boolean by,Class bClass, Method post, Method pre,ArrayList<Property> props) {
         name = n;
@@ -60,8 +62,6 @@ public class Bean {
     public void setByName(boolean byName) {
         this.byName = byName;
     }
-
-    public Bean() {}
 
 
     public ArrayList<Method> getSetters() {
@@ -138,39 +138,5 @@ public class Bean {
 
     public ArrayList<Property> getProperties() {
         return properties;
-    }
-
-    public void setProperties(ArrayList<Property> properties) {
-        this.properties = properties;
-    }
-
-    public String toString() {
-        String str = "Bean name: "+name+"\nType: "+beanClass.getName()+"\nScope: ";
-        if(singleton) {
-            str+="singleton";
-        } else {
-            str+="prototype";
-        }
-        str += "\nAutowiring mode: ";
-        if(byName) {
-            str+="byName";
-        } else {
-            str+="byType";
-        }
-        str += "\nInjection type: ";
-        if(injectionType=='c') {
-            str+="constructor";
-        } else if(injectionType=='s') {
-            str+="setter";
-        }
-        str += "\npostConstructor: "+postConstruct+"\npreDestruct: "+preDestruct + "\n";
-
-        if(!properties.isEmpty()) {
-            str+="\nProperties:\n";
-            for (Property prop: properties) {
-                str += prop.toString()+"\n\n";
-            }
-        }
-        return str;
     }
 }

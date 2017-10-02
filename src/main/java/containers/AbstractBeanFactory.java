@@ -26,7 +26,7 @@ public abstract class AbstractBeanFactory implements BeanFactory {
 
     }
 
-    public boolean recursiveDependencyCycle(Stack<String> stack){
+    private boolean recursiveDependencyCycle(Stack<String> stack){
         Bean bean = beans.get(stack.peek());
         if(bean != null ) {
             for (Property property : bean.getProperties()) {
@@ -52,18 +52,6 @@ public abstract class AbstractBeanFactory implements BeanFactory {
         } else {
             beans.put(key, bean);
         }
-    }
-
-    public String printBean(String key) {
-        return beans.get(key).toString();
-    }
-
-    public String printBeans() {
-        String str = "";
-        for(Object bean : beans.values()) {
-            str += bean.toString();
-        }
-        return str;
     }
 
     public Object getBean(String name) throws BeanInstantiationException{

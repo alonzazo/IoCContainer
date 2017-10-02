@@ -3,9 +3,9 @@ package containers;
 public class Property {
 
     private String name;
-    private Object instance;
     private String ref;
     private String value;
+    private Object instance;
     private Class type;
 
     public Property() {}
@@ -44,16 +44,6 @@ public class Property {
 
     public Object getInstance() {
         return instance;
-    }
-
-    public String toString() {
-        String str = "  Property name: "+name;
-        if(value != null) {
-            str += "\n  value: "+value+"\n  instance: "+instance;
-        } else if (ref != null) {
-            str += "\n  ref: "+ref;
-        }
-        return str;
     }
 
     public Class getType() {
